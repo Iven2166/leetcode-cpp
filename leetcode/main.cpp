@@ -66,154 +66,105 @@ public:
 class Solution {
 public:
     
-    // 实现二分查找
-    int higherBound(int nums[], int l, int r, int target)
-    {
-        // 在nums里找第一个大于等于target的下标
-        int mid = -1;
-        while(l < r){
-            mid = (l + r) >> 1;
-            if(nums[mid] <= target){
-                l = mid + 1;
+    //32. 最长有效括号
+
+    int longestValidParentheses(string s) {
+        int n = s.size();
+        int ans = 0;
+        vector<vector<bool>> dp;
+        dp.resize(n);
+        for(int i=0; i<n; i++)
+        {
+            dp[i].resize(n);
+        }
+        
+        for(int i=0; i<n-1; i++){
+            dp[i][i+1] = dp[i][i+1] | ((s[i]=='(' && s[i+1]==')') ? true : false);
+        }
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                if(i+1>0 && j-1<n && i+1<j-1){
+                    if(s[i]=='(' && s[j]==')')
+                        dp[i][j] = dp[i][j] | dp[i+1][j-1];
+                }
+                if(i+2>0 && j<n && i+2<j){
+                    if(s[i]=='(' && s[i+1]==')')
+                        dp[i][j] = dp[i][j] | dp[i+2][j];
+                }
+                if(i>0 && j-2<n && i+2<j){
+                    if(s[j-1]=='(' && s[j]==')')
+                        dp[i][j] = dp[i][j] | dp[i][j-2];
+                }
+                if(dp[i][j] && j-i+1 > ans)
+                    ans = j-i+1;
             }
-            else{r = mid;}
         }
-        return nums[l] > target ? l : -1;
-    }
-    int lowerBound(int nums[], int l, int r, int target)
-    {
-        // 在nums里找第一个大于等于target的下标
-        int mid = -1;
-        while(l < r){
-            mid = (l + r) >> 1;
-            if(nums[mid] < target){
-                l = mid + 1;
-            }
-            else{r = mid;}
-        }
-        return nums[l] >= target ? l : -1;
-    }
-    
-    //209. 长度最小的子数组
-    int minSubArrayLen(int target, vector<int>& nums){
-        vector<int> prefix;
-        prefix.push_back(0);
-        for(int num: nums){
-            prefix.push_back(prefix[prefix.size() - 1] + num);
-        }
-        // prefix为前缀和
-        int ans = nums.size();
-        for(int i=1; i<=nums.size(); i++){
-            int t = prefix[i - 1] + target;
-            //            vector<int>::iterator idx = std::upper_bound(prefix.begin(), prefix.end(), t);
-            int idx = std::upper_bound(prefix.begin(), prefix.end(), t) - prefix.begin();
-            if(idx != prefix.size())
-                ans = min(ans, idx - i + 1);
-        }
-        if(ans == nums.size())
-            return 0;
         return ans;
     }
     
-    // 46. 全排列
-    vector<vector<int>> permute(vector<int>& nums) {
-        vector<vector<int>> ans;
-        vector<int> cur, visited(nums.size(), 0);
-        permuteDFS(nums, ans, cur, visited);
+    vector<string> generateParenthesis2(int n) {
+        vector<string> ans;
+        unordered_map<char, char> hashmap;
+        hashmap['('] = ')';
+        string cur = "";
+        generateParenthesisCore2(ans, cur, n, 0);
         return ans;
     }
-    void permuteDFS(vector<int>& nums, vector<vector<int>>& ans, vector<int>& cur, vector<int>& visited){
-        int cnt = 0;
-        for(int i: visited){
-            cnt += i;
-        }
-        if(cnt == visited.size()){
-            ans.push_back(cur);
+    void generateParenthesisCore2(vector<string>& ans, string cur, int n, int left_cnt){
+        if(cur.size() == n * 2){
+            if (left_cnt == 0)
+                ans.push_back(cur);
             return;
         }
-        for(int i=0; i<visited.size(); i++){
-            if(visited[i] == 0){
-                cur.push_back(nums[i]);
-                visited[i] = 1;
-                permuteDFS(nums, ans, cur, visited);
-                visited[i] = 0;
+        else if(cur.size() > n * 2){
+            return;
+        }
+        else{
+            if(left_cnt == 0){
+                cur.push_back('(');
+                generateParenthesisCore2(ans, cur, n, left_cnt + 1);
+            }
+            else{
+                cur.push_back('(');
+                generateParenthesisCore2(ans, cur, n, left_cnt + 1);
+                cur.pop_back();
+                cur.push_back(')');
+                generateParenthesisCore2(ans, cur, n, left_cnt - 1);
                 cur.pop_back();
             }
         }
+        
     }
-    // 31. 下一个排列
-    void nextPermutation(vector<int> &nums){
-        int n = nums.size();
-        int i = n - 2;
-        while(i >= 0 && nums[i] >= nums[i+1])
-            i --;
-        if(i >= 0){
-            int j = n - 1;
-            while(j >= i + 1 && nums[j] < nums[i])
-                j--;
-            swap(nums[i], nums[j]);
-        }
-        int left = i + 1, right = n - 1;
-        while(left <= right){
-            swap(nums[left], nums[right]);
-            left++;
-            right--;
-        }
-//        sort(nums.begin() + i + 1,nums.end());
-    }
-    // 394. 字符串解码
-    string decodeString(string s){
-        stack<pair<string,int>> stk;
-        string ans = "";
-        string tmp = "";
-        int multi = 0;
-        for(int i=0; i<s.size(); i++){
-            if((s[i] >= 'a' && s[i] <= 'z') ||(s[i] >= 'A' && s[i] <= 'Z')){
-                ans.push_back(s[i]);
-            }
-            else if(s[i] >= '0' && s[i] <= '9'){
-                multi = 10 * multi + s[i] - '0';
-                cout << multi << endl;
-            }
-            else if(s[i] == '['){
-                stk.push({ans, multi});
-                ans = "";
-                multi = 0;
-            }
-            else{
-//                pair<string, int> tmp = ;
-                
-//                string cur_ans = ;
-//                ans += string(tmp.second, ans);
-                for(int x=0; x<stk.top().second; x++){
-                    stk.top().first += ans;
+    
+    // 16. 最接近的三数之和
+    
+    int threeSumClosest(vector<int>& nums, int target) {
+        sort(nums.begin(), nums.end());
+        int ans = 0;
+        int gap = INT_MAX;
+        for(int i = 0; i < nums.size() - 2; i++){
+            int t = nums[i];
+            int left = i + 1, right = nums.size() - 1;
+            while(left < right){
+                if(left < right && abs(t + nums[left] + nums[right] - target)< gap){
+                    ans = t + nums[left] + nums[right];
+                    // cout << nums[i] << ',' << nums[left] << ',' << nums[right] << endl;
+                    gap = abs(target - ans);
                 }
-                ans = stk.top().first;
-                stk.pop();
+                if(nums[left] + nums[right] + t == target){
+                    return target;
+                }
+                else if(nums[left] + nums[right] + t < target){
+                    left++;
+                }
+                else {
+                    right--;
+                }
+                
             }
         }
         return ans;
     }
-    
-    // 1760. 袋子里最少数目的球
-    int minimumSize(vector<int> & nums, int maxOperations)
-    {
-        int left = 1, right = *std::max_element(nums.begin(), nums.end());
-        int ans = -1;
-        // (nums[i]-1)/y，y是我们要二分寻找的数值
-        while(left <= right){
-            int mid = (right + left) >> 1;
-            long long ops = 0;
-            for(auto i: nums){ops += (i-1)/mid;}
-            if(ops <= maxOperations){
-                ans = mid;
-                right = mid - 1;
-            }
-            else{left = mid + 1;}
-        }
-        return ans;
-    }
-    
     //541. 反转字符串 II
     string reverseStr(string s, int k) {
         int i = 0, n = s.size();
@@ -1007,6 +958,156 @@ public:
         }
         return ans;
     }
+    
+    // 实现二分查找
+    int higherBound(int nums[], int l, int r, int target)
+    {
+        // 在nums里找第一个大于等于target的下标
+        int mid = -1;
+        while(l < r){
+            mid = (l + r) >> 1;
+            if(nums[mid] <= target){
+                l = mid + 1;
+            }
+            else{r = mid;}
+        }
+        return nums[l] > target ? l : -1;
+    }
+    int lowerBound(int nums[], int l, int r, int target)
+    {
+        // 在nums里找第一个大于等于target的下标
+        int mid = -1;
+        while(l < r){
+            mid = (l + r) >> 1;
+            if(nums[mid] < target){
+                l = mid + 1;
+            }
+            else{r = mid;}
+        }
+        return nums[l] >= target ? l : -1;
+    }
+    
+    //209. 长度最小的子数组
+    int minSubArrayLen(int target, vector<int>& nums){
+        vector<int> prefix;
+        prefix.push_back(0);
+        for(int num: nums){
+            prefix.push_back(prefix[prefix.size() - 1] + num);
+        }
+        // prefix为前缀和
+        int ans = nums.size();
+        for(int i=1; i<=nums.size(); i++){
+            int t = prefix[i - 1] + target;
+            //            vector<int>::iterator idx = std::upper_bound(prefix.begin(), prefix.end(), t);
+            int idx = std::upper_bound(prefix.begin(), prefix.end(), t) - prefix.begin();
+            if(idx != prefix.size())
+                ans = min(ans, idx - i + 1);
+        }
+        if(ans == nums.size())
+            return 0;
+        return ans;
+    }
+    
+    // 46. 全排列
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> cur, visited(nums.size(), 0);
+        permuteDFS(nums, ans, cur, visited);
+        return ans;
+    }
+    void permuteDFS(vector<int>& nums, vector<vector<int>>& ans, vector<int>& cur, vector<int>& visited){
+        int cnt = 0;
+        for(int i: visited){
+            cnt += i;
+        }
+        if(cnt == visited.size()){
+            ans.push_back(cur);
+            return;
+        }
+        for(int i=0; i<visited.size(); i++){
+            if(visited[i] == 0){
+                cur.push_back(nums[i]);
+                visited[i] = 1;
+                permuteDFS(nums, ans, cur, visited);
+                visited[i] = 0;
+                cur.pop_back();
+            }
+        }
+    }
+    // 31. 下一个排列
+    void nextPermutation(vector<int> &nums){
+        int n = nums.size();
+        int i = n - 2;
+        while(i >= 0 && nums[i] >= nums[i+1])
+            i --;
+        if(i >= 0){
+            int j = n - 1;
+            while(j >= i + 1 && nums[j] < nums[i])
+                j--;
+            swap(nums[i], nums[j]);
+        }
+        int left = i + 1, right = n - 1;
+        while(left <= right){
+            swap(nums[left], nums[right]);
+            left++;
+            right--;
+        }
+//        sort(nums.begin() + i + 1,nums.end());
+    }
+    // 394. 字符串解码
+    string decodeString(string s){
+        stack<pair<string,int>> stk;
+        string ans = "";
+        string tmp = "";
+        int multi = 0;
+        for(int i=0; i<s.size(); i++){
+            if((s[i] >= 'a' && s[i] <= 'z') ||(s[i] >= 'A' && s[i] <= 'Z')){
+                ans.push_back(s[i]);
+            }
+            else if(s[i] >= '0' && s[i] <= '9'){
+                multi = 10 * multi + s[i] - '0';
+                cout << multi << endl;
+            }
+            else if(s[i] == '['){
+                stk.push({ans, multi});
+                ans = "";
+                multi = 0;
+            }
+            else{
+//                pair<string, int> tmp = ;
+                
+//                string cur_ans = ;
+//                ans += string(tmp.second, ans);
+                for(int x=0; x<stk.top().second; x++){
+                    stk.top().first += ans;
+                }
+                ans = stk.top().first;
+                stk.pop();
+            }
+        }
+        return ans;
+    }
+    
+    // 1760. 袋子里最少数目的球
+    int minimumSize(vector<int> & nums, int maxOperations)
+    {
+        int left = 1, right = *std::max_element(nums.begin(), nums.end());
+        int ans = -1;
+        // (nums[i]-1)/y，y是我们要二分寻找的数值
+        while(left <= right){
+            int mid = (right + left) >> 1;
+            long long ops = 0;
+            for(auto i: nums){ops += (i-1)/mid;}
+            if(ops <= maxOperations){
+                ans = mid;
+                right = mid - 1;
+            }
+            else{left = mid + 1;}
+        }
+        return ans;
+    }
+    
+    
     
     
     // 归并排序
