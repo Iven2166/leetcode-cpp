@@ -67,7 +67,7 @@ class Solution {
 public:
     
     //32. 最长有效括号
-
+    
     int longestValidParentheses(string s) {
         int n = s.size();
         int ans = 0;
@@ -299,7 +299,7 @@ public:
         }
         return ans;
     }
-
+    
     // 树的中序遍历
     vector<int> inorderTraversal(TreeNode* root) {
         vector<int> res;
@@ -353,7 +353,7 @@ public:
     }
     
     // 322周赛
-     
+    
     int minScore(int n, vector<vector<int>>& roads) {
         vector<vector<pair<int,int>>> dict(n+1);
         for(auto& iter: roads){
@@ -1052,7 +1052,7 @@ public:
             left++;
             right--;
         }
-//        sort(nums.begin() + i + 1,nums.end());
+        //        sort(nums.begin() + i + 1,nums.end());
     }
     // 394. 字符串解码
     string decodeString(string s){
@@ -1074,10 +1074,10 @@ public:
                 multi = 0;
             }
             else{
-//                pair<string, int> tmp = ;
+                //                pair<string, int> tmp = ;
                 
-//                string cur_ans = ;
-//                ans += string(tmp.second, ans);
+                //                string cur_ans = ;
+                //                ans += string(tmp.second, ans);
                 for(int x=0; x<stk.top().second; x++){
                     stk.top().first += ans;
                 }
@@ -1283,7 +1283,7 @@ int main(){
     cout << endl;
     
     int tmp[] = {1,2,3,4,5};
-//    vector<int> tmp = {1,2,3,4,5};
+    //    vector<int> tmp = {1,2,3,4,5};
     cout << solution.lowerBound(tmp, 0, 5, 3)<<endl;
     cout << solution.higherBound(tmp, 0, 5, 3)<<endl;
     
