@@ -65,6 +65,23 @@ public:
 
 class Solution {
 public:
+    // 1750. 删除字符串两端相同字符后的最短长度
+
+    int minimumLength(string s) {
+        int n = s.size();
+        int left = 0, right = n - 1;
+        
+        while(left < right && s[left] == s[right]){
+            char cur = s[left];
+            while(left <= right && s[left] == cur){
+                left++;
+            }
+            while(left <= right && s[right] == cur){
+                right--;
+            }
+        }
+        return right - left + 1;
+    }
     
     //32. 最长有效括号
     
