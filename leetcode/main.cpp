@@ -196,6 +196,13 @@ int main(){
     double sword_res13 = sword_solu.Power(4.0, 13);
     cout << sword_res13 << endl;
     
+    cout << "----- 剑指 Offer 17.打印大数 -----" << endl;
+//    sword_solu.Print1ToMaxNDigits1(3);
+    sword_solu.Print1ToMaxNDigits2(3);
+    cout << endl;
+    
+    
+    
     return 0;////
 }
 

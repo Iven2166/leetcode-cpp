@@ -263,7 +263,7 @@ public:
     }
     //541. 反转字符串 II
     string reverseStr(string s, int k) {
-        int i = 0, n = s.size();
+        int n = s.size();
         for(int i=0; i < n; i += 2*k){
             reverse(s.begin() + i, s.begin() + min(i + k, n));
         }
