@@ -1293,6 +1293,108 @@ public:
         return res;
     }
     
+//    "503. 下一个更大元素 II"
+//    给定一个循环数组 nums （ nums[nums.length - 1] 的下一个元素是 nums[0] ），返回 nums 中每个元素的 下一个更大元素 。
+//
+//    数字 x 的 下一个更大的元素 是按数组遍历顺序，这个数字之后的第一个比它更大的数，这意味着你应该循环地搜索它的下一个更大的数。如果不存在，则输出 -1 。
+//
+//    来源：力扣（LeetCode）
+//    链接：https://leetcode.cn/problems/next-greater-element-ii
+//    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+    vector<int> nextGreaterElement2(vector<int> & nums){
+        vector<int> input = nums;
+        input.insert(input.end(), nums.begin(), nums.end());
+        vector<int> output(nums.size());
+        int n = nums.size();
+        stack<int> tmp;
+        for(int i=input.size()-1; i>=0; i--){
+            while(!tmp.empty() && input[i]>=tmp.top())
+                tmp.pop();
+            output[i%n] = tmp.empty()? -1: tmp.top();
+            tmp.push(input[i]);
+        }
+        return output;
+    }
+    
+//    "698. 划分为k个相等的子集"
+//    给定一个整数数组  nums 和一个正整数 k，找出是否有可能把这个数组分成 k 个非空子集，其总和都相等。
+//    参考：https://labuladong.github.io/algo/di-san-zha-24031/bao-li-sou-96f79/jing-dian--93320/
+//    解法：
+//        对于每一个数字来说，应该选择哪个桶。所以回溯backtrack写在数字的角度。
+    
+    bool canPartitionKSubsets698(vector<int> & input, int k){
+        
+        int sum = 0;
+        for(int v: input){sum += v;}
+        if(sum % k > 0){return false;}
+        int target = sum / k;
+        vector<int> bucket(k); //
+        
+        return canPartitionKSubsets_backtrack(input, 0, target, bucket);
+    }
+    
+    bool canPartitionKSubsets_backtrack(vector<int>& input, int index, int target, vector<int>& bucket){
+        if(index == input.size()){
+//            到达最后一位数字的选择，此时如果已经选完，那么全部bucket应该是刚好填满
+            for(int i=0; i<bucket.size(); i++){
+                if(bucket[i]!=target){
+                    return false;
+                }
+            }
+            return true;
+        }
+        // 穷举 input[index] 目前能够装入的桶
+        for(int i = 0; i < bucket.size(); i++){
+            // 将 input[index] 装入目前的桶里
+            bucket[i] += input[index];
+            if(canPartitionKSubsets_backtrack(input, index + 1, target, bucket)){
+                return true;
+            }
+            bucket[i] -= input[index];
+        }
+        // input[index]无法装入任何一个桶
+        return false;
+    }
+    
+    // 从桶的视角，来进行数字的放入与不放入的选择。时间复杂度：O(k* 2^N) 对于k个桶来说，遍历n个数字，做2次选择（放入与不放入）
+    bool canPartitionKSubsets698_fromBuckets(vector<int> & input, int k){
+        int sum = 0;
+        for(int v: input){sum += v;}
+        if(sum % k > 0){return false;}
+        int target = sum / k;
+        int used = 0;
+        unordered_map<int, bool> memo; // 用以记录中间状态，减少冗余的回溯
+        // k 号桶初始什么都没装，从 nums[0] 开始做选择
+        return canPartitionKSubsets698_fromBuckets_backtrack(input, 0, 0, used, target, k, memo);
+    }
+    
+    bool canPartitionKSubsets698_fromBuckets_backtrack(vector<int>& input,
+                                                       int bucket_value,
+                                                       int start,
+                                                       int used,
+                                                       int target,
+                                                       int k,
+                                                       unordered_map<int, bool> memo){
+        if(k == 0){return true; } // 所有桶都被装满，因为sum%k==0
+        if(bucket_value == target){
+            // 装满了这个桶,到下一个桶
+            bool res = canPartitionKSubsets698_fromBuckets_backtrack(input, 0, 0, used, target, k-1, memo);
+            memo[used] = res;
+            return res;
+        }
+        if(memo.count(used)){return memo[used];}
+        for(int i = start; i < input.size(); i++){
+            if(((used>>i) & 1) == 1){continue;}//i位置已经装入别的桶里
+            if(input[i] + bucket_value > target){continue;}
+            
+            used |= (1<<i);
+            bucket_value += input[i];
+            if(canPartitionKSubsets698_fromBuckets_backtrack(input, bucket_value, i + 1, used, target, k, memo)){return true;}
+            used ^= (1<<i);
+            bucket_value -= input[i];
+        }
+        return false;
+    }
 };
 
 

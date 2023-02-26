@@ -220,6 +220,22 @@ int main(){
     for(int i=0; i<res739.size(); i++){
         cout << res739[i] << ',';
     }
+    cout << endl;
+    
+    cout << "503. 下一个更大元素 II" << endl;
+    vector<int> input503 = {1,2,1}; // 应该返回 [2,-1,2]
+    for(auto i: solution.nextGreaterElement2(input503))
+        cout << i << ',';
+    cout << endl;
+    
+    cout << "698. 划分为k个相等的子集" << endl;
+    vector<int> input698 = {4, 3, 2, 3, 5, 2, 1}; // 返回true， 有可能将其分成 4 个子集（5），（1,4），（2,3），（2,3）等于总和
+    int k698 = 4;
+    bool output698 = solution.canPartitionKSubsets698(input698, k698);
+    cout << output698 << endl;
+    
+    bool output698_frombuckets = solution.canPartitionKSubsets698_fromBuckets(input698, k698);
+    cout << output698_frombuckets << endl;
     return 0;
 }
 
