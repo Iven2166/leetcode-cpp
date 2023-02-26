@@ -10,6 +10,39 @@
 
 class sword_solution {
 public:
+    // 面试题18: 删除链表的节点
+    void DeleteNode(ListNode** pListHead, ListNode* pToBeDeleted){
+        // 其一为空的
+        if(!pListHead || !pToBeDeleted){
+            return ;
+        }
+        // 要删除的节点不是尾节点
+        if(pToBeDeleted->next != nullptr){
+            ListNode* pNext = pToBeDeleted->next;
+            pToBeDeleted->val = pNext->val;
+            pToBeDeleted->next = pNext->next;
+            
+            delete pNext;
+            pNext = nullptr;
+        }
+        // 链表只有一个节点，删除头节点
+        else if(*pListHead == pToBeDeleted){
+            delete pToBeDeleted;
+            pToBeDeleted = nullptr;
+            *pListHead = nullptr;
+        }
+        // 链表有多个节点，删除尾节点（pToBeDeleted->next==nullptr)
+        else{
+            ListNode* pNode = *pListHead;
+            while(pNode->next != pToBeDeleted){
+                pNode = pNode->next;
+            }
+            pNode->next = nullptr;
+            delete pToBeDeleted;
+            pToBeDeleted = nullptr;
+        }
+    }
+    
     // 面试题17:打印从1到最大的n位数
     void Print1ToMaxNDigits2(int n){
         if(n <= 0)

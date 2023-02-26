@@ -197,8 +197,8 @@ int main(){
     cout << sword_res13 << endl;
     
     cout << "----- 剑指 Offer 17.打印大数 -----" << endl;
-//    sword_solu.Print1ToMaxNDigits1(3);
-    sword_solu.Print1ToMaxNDigits2(3);
+//    sword_solu.Print1ToMaxNDigits1(2);
+    sword_solu.Print1ToMaxNDigits2(2);
     cout << endl;
     
     
