@@ -56,7 +56,6 @@ int main(){
         res2 = res2->next;
     }
     
-    
     cout << "----- no.4 -----";
     cout << endl;
     vector<int> nums1 = {1,2,3,5,6,10};
@@ -202,7 +201,25 @@ int main(){
     cout << endl;
     
     
+    cout << "单调栈" << endl;
+//    vector<int> input_dandiao = {2,1,2,4,3};
+    int input_dandiao[] = {2,1,2,4,3};
+//    for(auto i: solution.nextLargerElement(input_dandiao)){
+//        cout << i << ",";
+//    }
+    int* output_dandiao;
+    output_dandiao = solution.nextLargerElement(input_dandiao, sizeof(input_dandiao)/sizeof(int));
+    for(int i=0; i<5; i++){
+        cout << output_dandiao[i] << ",";
+    }
+    cout << endl;
     
-    return 0;////
+    cout << "739. 每日温度" << endl;
+    vector<int> input739 = {73,74,75,71,69,72,76,73};
+    vector<int> res739 = solution.dailyTemperatures(input739);
+    for(int i=0; i<res739.size(); i++){
+        cout << res739[i] << ',';
+    }
+    return 0;
 }
 

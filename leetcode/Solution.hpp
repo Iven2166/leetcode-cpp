@@ -1251,7 +1251,47 @@ public:
         return right - left + 1;
     }
     
+//    单调栈 https://labuladong.github.io/algo/di-yi-zhan-da78c/shou-ba-sh-daeca/dan-diao-z-1bebe/
+//    输入数组 nums = [2,1,2,4,3] 返回数组是每个位置上下一个最近的更大数，如果没有则为-1，结果数组为 [4,2,4,-1,-1]
+//    数组倒着入栈。栈维护单调，栈顶要小于栈底，否则弹出目前的数字（因为新入栈的数对于未来入栈的数肯定是更接近的大数）。入栈时就判断结果是什么。
+    int* nextLargerElement(int input[], int n)
+    {
+        stack<int> tmp;
+        static int* res = new int[n];  // https://blog.csdn.net/qq_33185750/article/details/106978132
+        for(int i = n - 1; i >= 0; i--){
+            while(!tmp.empty() && tmp.top() <= input[i]){
+                tmp.pop();
+            }
+            res[i] = tmp.empty() ? -1 : tmp.top();
+            tmp.push(input[i]);
+        }
+        return res;
+    }
     
+    // "739. 每日温度"
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        // 给定一个整数数组 temperatures ，表示每天的温度，返回一个数组 answer ，其中 answer[i] 是指对于第 i 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 0 来代替
+        // 输入: temperatures = [73,74,75,71,69,72,76,73]
+        // 输出: [1,1,4,2,1,1,0,0]
+        // 解法：
+        //        逆序地遍历input数组。
+        //        栈存储单调递减的序列，即每次比较栈顶，while（如果大于栈顶，则弹出栈顶），再把目前的数加到栈顶。
+        //        如何确定加多少天？
+        //            栈为空时，说明当前没有比目前数字更高的温度，应该是0.
+        //            栈不为空，则目前栈顶是最近的更高温度的天，应该查看这是哪一天，并且返回gap，存储。
+        //        因此，栈需要是 stack<int,int>
+        int n = temperatures.size();
+        vector<int> res(n);
+        stack<pair<int, int>> tmp;
+        for(int i=n-1; i>=0; i--){
+            while(!tmp.empty() && temperatures[i]>=tmp.top().first){
+                tmp.pop();
+            }
+            res[i] = tmp.empty() ? 0 : tmp.top().second - i;
+            tmp.push(pair(temperatures[i], i));
+        }
+        return res;
+    }
     
 };
 
