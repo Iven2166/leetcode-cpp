@@ -236,6 +236,22 @@ int main(){
     
     bool output698_frombuckets = solution.canPartitionKSubsets698_fromBuckets(input698, k698);
     cout << output698_frombuckets << endl;
+    
+    cout << "86. 分隔链表" << endl;
+    ListNode* input86 = new ListNode(-1);
+    ListNode* input86_dummy = input86;
+    for(auto& it: {1,6,3,2,5,2}){
+        input86_dummy->next = new ListNode(it);
+        input86_dummy = input86_dummy->next;
+    }
+    ListNode* output86 = solution.partition86(input86->next, 3);
+    ListNode* output86_dummy = output86;
+    while(output86_dummy!=nullptr){
+        cout << output86_dummy->val << ',';
+        output86_dummy = output86_dummy->next;
+    }
+    cout << endl;
+    
     return 0;
 }
 
