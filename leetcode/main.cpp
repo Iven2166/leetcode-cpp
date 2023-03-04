@@ -360,6 +360,23 @@ int main(){
     }
     cout << endl;
     
+    cout << "19. 删除链表的倒数第 N 个结点" << endl;
+    ListNode* input19 = new ListNode;
+    ListNode* p19 = input19;
+    for(auto& i:{1,2,3,4,5}){
+        p19->next = new ListNode(i);
+        p19 = p19->next;
+    }
+    
+    ListNode* output19 = solution.removeNthFromEnd(input19->next, 2);
+    ListNode* output19_p = output19;
+    cout << "out: ";
+    while(output19_p!=nullptr){
+        cout << output19_p->val << ",";
+        output19_p = output19_p->next;
+    }
+    cout << endl;
+    
     return 0;
 }
 

@@ -1530,6 +1530,16 @@ public:
         return timu23_merge(lists, 0, lists.size() - 1);
     }
     
+    // 19. 删除链表的倒数第 N 个结点
+    // 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode* p1 = head;
+        for(int i=0; i<n; i++){p1 = p1->next;}
+        ListNode* p2 = head;
+        while(p1->next!=nullptr){p2=p2->next; p1=p1->next;}
+        p2->next = p2->next->next;
+        return head;
+    }
 };
 
 
