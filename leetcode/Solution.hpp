@@ -36,6 +36,34 @@ struct TreeNode{
     TreeNode(int x, TreeNode* left, TreeNode* right): val(x), left(left), right(right){}
 };
 
+class myPriorityQueueCompareOnListnodes
+{
+    bool reverse;
+public:
+    myPriorityQueueCompareOnListnodes(const bool &myparam=false){
+        reverse = myparam;
+    }
+    bool operator() (const ListNode* p1, const ListNode* p2){
+        return (p1->val > p2->val);
+    }
+};
+
+
+class myPriorityQueueCompareOnInts
+{
+    bool reverse;
+public:
+    myPriorityQueueCompareOnInts(const bool& revparam=false)
+    {
+        reverse=revparam;
+    }
+    bool operator() (const int& lhs, const int& rhs){
+        if(reverse){return (lhs>rhs);}
+        else{return (lhs<rhs);}
+    }
+};
+
+
 class Solution {
 public:
     
@@ -1433,18 +1461,78 @@ public:
         return dummy1->next;
     }
     
+    // 23. 合并K个升序链表
+//    给你一个链表数组，每个链表都已经按升序排列。
+//
+//    请你将所有链表合并到一个升序链表中，返回合并后的链表。
+//    输入：lists = [[1,4,5],[1,3,4],[2,6]]
+//    输出：[1,1,2,3,4,4,5,6]
+//    解释：链表数组如下：
+//    [
+//      1->4->5,
+//      1->3->4,
+//      2->6
+//    ]
+//    将它们合并到一个有序链表中得到。
+//    1->1->2->3->4->4->5->6
+//
+//    来源：力扣（LeetCode）
+//    链接：https://leetcode.cn/problems/merge-k-sorted-lists
+//    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+    
+    
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        priority_queue<ListNode*, vector<ListNode*>, myPriorityQueueCompareOnListnodes> my_pq;
+        for(auto& item: lists){
+            if(item!=nullptr)my_pq.push(item);
+        }
+        ListNode* dummy = new ListNode(0);
+        ListNode* p = dummy;
+        while(!my_pq.empty()){
+            ListNode* tmp = my_pq.top();
+            p->next = new ListNode(tmp->val);
+            p = p->next;
+            my_pq.pop();
+            if(tmp->next!=nullptr){my_pq.push(tmp->next);}
+        }
+        return dummy->next;
+    }
+    
+    // 方法2:分治算法
+    ListNode* timu23_mergeTwoLists(ListNode* list1, ListNode* list2){
+        // 如果其中一个为空，判断去返回
+        if((!list1)||(!list2)){return list1? list1: list2;}
+        // 两个均不为空
+        ListNode* dummy = new ListNode;
+        ListNode* p = dummy;
+        ListNode* p1 = list1;
+        ListNode* p2 = list2;
+        while(p1 && p2){
+            if(p1->val < p2->val){
+                p->next = new ListNode(p1->val);
+                p1 = p1->next;}
+            else{p->next = new ListNode(p2->val);
+                p2 = p2->next;}
+            p = p->next;
+        }
+        p->next = p1 ? p1: p2;
+        return dummy->next;
+    }
+    ListNode* timu23_merge(vector<ListNode*>& lists, int l, int r){
+        if(l==r){return lists[l];}
+        else if(l>r){return nullptr;}
+        else{
+            int mid = (l + r) / 2;
+            return timu23_mergeTwoLists(timu23_merge(lists, l, mid), timu23_merge(lists, mid+1, r));
+        }
+    }
+    ListNode* timu23_mergeKListsMethod2(vector<ListNode*>& lists){
+        return timu23_merge(lists, 0, lists.size() - 1);
+    }
+    
 };
 
-class myPriorityQueueCompareOnInts
-{
-    bool reverse;
-public:
-    myPriorityQueueCompareOnInts(const bool& revparam=false){reverse=revparam;}
-    bool operator() (const int& lhs, const int& rhs){
-        if(reverse){return (lhs>rhs);}
-        else{return (lhs<rhs);}
-    }
-};
+
 
 
 

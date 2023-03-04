@@ -269,12 +269,23 @@ int main(){
      q.pop();//删掉q的第一个元素
      q.top();//返回q的第一个元素
      */
+    priority_queue<int, vector<int>> default_heap;
+    for(auto& i: {2,3,6,1,0}){
+        default_heap.push(i);
+//        cout << i;
+    }
+    cout << "default, size" << default_heap.size() << endl;
+    while(!default_heap.empty()){
+            cout<<default_heap.top()<<endl;
+        default_heap.pop();
+    }
+    
     priority_queue<int, vector<int>, less<int>> big_heap;
     for(auto& i: {2,3,6,1,0}){
         big_heap.push(i);
 //        cout << i;
     }
-    cout << "size" << big_heap.size() << endl;
+    cout << "less, size" << big_heap.size() << endl;
     while(!big_heap.empty()){
             cout<<big_heap.top()<<endl;
             big_heap.pop();
@@ -284,20 +295,71 @@ int main(){
         small_heap.push(i);
 //        cout << i;
     }
-    cout << "size" << small_heap.size() << endl;
+    cout << "greater, size" << small_heap.size() << endl;
     while(!small_heap.empty()){
             cout<<small_heap.top()<<endl;
         small_heap.pop();
     }
     cout << "自定义优先队列" << endl;
-    priority_queue<int, vector<int>, myPriorityQueueCompareOnInts> mypq_type;
+    typedef priority_queue<int, vector<int>, myPriorityQueueCompareOnInts> mypq_type;
+    mypq_type self_define(myPriorityQueueCompareOnInts(false));
     for(auto& i: {2,3,6,1,0}){
-        mypq_type.push(i);
+        self_define.push(i);
     }
-    while(!mypq_type.empty()){
-        cout<<mypq_type.top()<<endl;
-        mypq_type.pop();
+    while(!self_define.empty()){
+        cout<<self_define.top()<<endl;
+        self_define.pop();
     }
+    
+    cout << "23. 合并k个升序链表" << endl;
+    ListNode* input23_1 = new ListNode;
+    ListNode* p1 = input23_1;
+    for(auto& i:{1,4,5}){
+        p1->next = new ListNode(i);
+        p1 = p1->next;
+    }
+    ListNode* input23_2 = new ListNode;
+    ListNode* p2 = input23_2;
+    for(auto& i:{1,3,4}){
+        p2->next = new ListNode(i);
+        p2 = p2->next;
+    }
+    ListNode* input23_3 = new ListNode;
+    ListNode* p3 = input23_3;
+    for(auto& i:{2,6}){
+        p3->next = new ListNode(i);
+        p3 = p3->next;
+    }
+    vector<ListNode*> input23_list;
+    input23_list = {input23_1->next, input23_2->next, input23_3->next};
+    ListNode* output23 = solution.mergeKLists(input23_list);
+    ListNode* p;
+    for(auto item: input23_list){
+        p = item;
+        while(p!=nullptr){
+            cout << p->val << ",";
+            p = p->next;
+        }
+        cout << endl;
+    }
+    ListNode* out_p = output23;
+    cout << "out: ";
+    while(out_p!=nullptr){
+        cout << out_p->val << ",";
+        out_p = out_p->next;
+    }
+    cout << endl;
+    
+    cout << "23. 合并k个升序链表 - 归并算法" << endl;
+    ListNode* output23_method2 = solution.timu23_mergeKListsMethod2(input23_list);
+    ListNode* out_method2 = output23_method2;
+    cout << "out: ";
+    while(out_method2!=nullptr){
+        cout << out_method2->val << ",";
+        out_method2 = out_method2->next;
+    }
+    cout << endl;
+    
     return 0;
 }
 
