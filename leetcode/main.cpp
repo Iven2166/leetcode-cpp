@@ -252,6 +252,52 @@ int main(){
     }
     cout << endl;
     
+    cout << "实现最小堆、最大堆" << endl;
+    /*
+     参考
+     中文：https://blog.csdn.net/geter_CS/article/details/102580332
+     https://cplusplus.com/reference/queue/priority_queue/
+     参数：
+     第一个参数T：元素（element）类型
+     第二个参数Container：必须是容器类型Container，用来存储元素（element），其类型必须是第一个参数
+     第三个参数Compare：比较形式，默认是less
+     
+     方法：
+     q.size();//返回q里元素个数
+     q.empty();//返回q是否为空，空则返回1，否则返回0
+     q.push(k);//在q的末尾插入k
+     q.pop();//删掉q的第一个元素
+     q.top();//返回q的第一个元素
+     */
+    priority_queue<int, vector<int>, less<int>> big_heap;
+    for(auto& i: {2,3,6,1,0}){
+        big_heap.push(i);
+//        cout << i;
+    }
+    cout << "size" << big_heap.size() << endl;
+    while(!big_heap.empty()){
+            cout<<big_heap.top()<<endl;
+            big_heap.pop();
+    }
+    priority_queue<int, vector<int>, greater<int>> small_heap;
+    for(auto& i: {2,3,6,1,0}){
+        small_heap.push(i);
+//        cout << i;
+    }
+    cout << "size" << small_heap.size() << endl;
+    while(!small_heap.empty()){
+            cout<<small_heap.top()<<endl;
+        small_heap.pop();
+    }
+    cout << "自定义优先队列" << endl;
+    priority_queue<int, vector<int>, myPriorityQueueCompareOnInts> mypq_type;
+    for(auto& i: {2,3,6,1,0}){
+        mypq_type.push(i);
+    }
+    while(!mypq_type.empty()){
+        cout<<mypq_type.top()<<endl;
+        mypq_type.pop();
+    }
     return 0;
 }
 

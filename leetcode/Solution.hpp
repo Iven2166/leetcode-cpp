@@ -1435,5 +1435,17 @@ public:
     
 };
 
+class myPriorityQueueCompareOnInts
+{
+    bool reverse;
+public:
+    myPriorityQueueCompareOnInts(const bool& revparam=false){reverse=revparam;}
+    bool operator() (const int& lhs, const int& rhs){
+        if(reverse){return (lhs>rhs);}
+        else{return (lhs<rhs);}
+    }
+};
+
+
 
 #endif /* Solution_hpp */
