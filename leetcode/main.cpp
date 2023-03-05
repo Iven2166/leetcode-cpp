@@ -403,6 +403,12 @@ int main(){
     // hasCycle_method1
     // hasCycle_method2
     
+    cout << "142. 环形链表 II" << endl;
+    // detectCycle
+    
+    cout << "160. 相交链表" << endl;
+    // getIntersectionNode_method1
+    // getIntersectionNode_method2
     
     return 0;
 }

@@ -1605,10 +1605,64 @@ public:
         }
         return false;
     }
+    
+    //    "142. 环形链表 II"
+    ListNode *detectCycle(ListNode *head) {
+        ListNode* p1 = head;
+        ListNode* p2 = head;
+        while(p1!=nullptr && p1->next!=nullptr){
+            p1 = p1->next->next;
+            p2 = p2->next;
+            if(p1 == p2)
+            {
+                ListNode* p3 = head;
+                // 此刻p2走了k步，p1走了2k步；交叉点距离环入口 m 步。此刻让 p2 再走，新的从头开始
+                while(p3!=nullptr && p2!=nullptr){
+                    if(p2 == p3){return p2;}
+                    p3 = p3->next;
+                    p2 = p2->next;
+                }
+            }
+        }
+        return nullptr;
+    }
+    
+    // "160. 相交链表"
+    ListNode *getIntersectionNode_method1(ListNode *headA, ListNode *headB) {
+        unordered_set<ListNode*> seen;
+        ListNode* p1 = headA;
+        ListNode* p2 = headB;
+        while(p1!=NULL || p2!=NULL){
+            if(p1){
+                if(seen.count(p1)){return p1;}
+                seen.insert(p1);
+                p1 = p1->next;
+            }
+            if(p2){
+                if(seen.count(p2)){return p2;}
+                seen.insert(p2);
+                p2 = p2->next;
+            }
+        }
+        return nullptr;
+    }
+    
+    ListNode *getIntersectionNode_method2(ListNode *headA, ListNode *headB) {
+            ListNode* p1 = headA;
+            ListNode* p2 = headB;
+            int c1 = 0;
+            int c2 = 0;
+            while(p1!=nullptr || p2!=nullptr){
+                if(p1 == p2){return p1;}
+                p1 = p1->next;
+                p2 = p2->next;
+                if(p1==nullptr && c1==0){p1 = headB; c1++;}
+                if(p2==nullptr && c2==0){p2 = headA; c2++;}
+            }
+            return nullptr;
+        }
+    
 };
-
-
-
 
 
 #endif /* Solution_hpp */
