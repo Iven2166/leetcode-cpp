@@ -367,15 +367,39 @@ int main(){
         p19->next = new ListNode(i);
         p19 = p19->next;
     }
+    input19 = input19->next;
     
-    ListNode* output19 = solution.removeNthFromEnd(input19->next, 2);
+    ListNode* output19 = solution.removeNthFromEnd(input19, 2);
     ListNode* output19_p = output19;
-    cout << "out: ";
+    cout << "方法1，双指针 out: ";
     while(output19_p!=nullptr){
         cout << output19_p->val << ",";
         output19_p = output19_p->next;
     }
     cout << endl;
+    
+    ListNode* output19_m2 = solution.removeNthFromEnd_method2(input19, 2);
+    ListNode* output19_p2 = output19_m2;
+    cout << "方法2，栈，注意传入的input19实际上在方法1解答里，已发生了改变 out: ";
+    while(output19_p2!=nullptr){
+        cout << output19_p2->val << ",";
+        output19_p2 = output19_p2->next;
+    }
+    cout << endl;
+    
+    cout << "876. 链表的中间结点" << endl;
+    ListNode* input876 = new ListNode;
+    ListNode* p876 = input876;
+    for(auto& i: {1,2,3,4,5,6}){
+        p876->next = new ListNode(i);
+        p876 = p876->next;
+    }
+    input876 = input876->next;
+    
+    ListNode* out876 = solution.middleNode(input876);
+    std::cout << out876->val << std::endl;
+    
+    
     
     return 0;
 }

@@ -1533,12 +1533,53 @@ public:
     // 19. 删除链表的倒数第 N 个结点
     // 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
     ListNode* removeNthFromEnd(ListNode* head, int n) {
-        ListNode* p1 = head;
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        
+        ListNode* p1 = dummy;
         for(int i=0; i<n; i++){p1 = p1->next;}
-        ListNode* p2 = head;
+        ListNode* p2 = dummy;
         while(p1->next!=nullptr){p2=p2->next; p1=p1->next;}
         p2->next = p2->next->next;
-        return head;
+        return dummy->next;
+    }
+    
+    ListNode* removeNthFromEnd_method2(ListNode* head, int n){
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        ListNode* p = dummy;
+        
+        stack<ListNode*> stk;
+        while(p!=nullptr){
+            stk.push(p);
+            p = p->next;
+        }
+        while(n>0){
+            stk.pop();
+            n--;
+        }
+        ListNode* end_p = stk.top();
+        end_p->next = end_p->next->next;
+        return dummy->next;
+    }
+    
+    // 876. 链表的中间结点
+    ListNode* middleNode(ListNode* head){
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        ListNode* p1 = dummy;
+        ListNode* p2 = dummy;
+        while(p1!=nullptr){
+            if(p1->next!=nullptr){
+                p1 = p1->next->next;
+                p2 = p2->next;
+            }
+            else{
+                p2 = p2->next;
+                break;
+            }
+        }
+        return p2;
     }
 };
 
