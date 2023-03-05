@@ -1262,7 +1262,7 @@ public:
     }
     
     // 1750. 删除字符串两端相同字符后的最短长度
-
+    
     int minimumLength(string s) {
         int n = s.size();
         int left = 0, right = n - 1;
@@ -1279,9 +1279,9 @@ public:
         return right - left + 1;
     }
     
-//    单调栈 https://labuladong.github.io/algo/di-yi-zhan-da78c/shou-ba-sh-daeca/dan-diao-z-1bebe/
-//    输入数组 nums = [2,1,2,4,3] 返回数组是每个位置上下一个最近的更大数，如果没有则为-1，结果数组为 [4,2,4,-1,-1]
-//    数组倒着入栈。栈维护单调，栈顶要小于栈底，否则弹出目前的数字（因为新入栈的数对于未来入栈的数肯定是更接近的大数）。入栈时就判断结果是什么。
+    //    单调栈 https://labuladong.github.io/algo/di-yi-zhan-da78c/shou-ba-sh-daeca/dan-diao-z-1bebe/
+    //    输入数组 nums = [2,1,2,4,3] 返回数组是每个位置上下一个最近的更大数，如果没有则为-1，结果数组为 [4,2,4,-1,-1]
+    //    数组倒着入栈。栈维护单调，栈顶要小于栈底，否则弹出目前的数字（因为新入栈的数对于未来入栈的数肯定是更接近的大数）。入栈时就判断结果是什么。
     int* nextLargerElement(int input[], int n)
     {
         stack<int> tmp;
@@ -1321,14 +1321,14 @@ public:
         return res;
     }
     
-//    "503. 下一个更大元素 II"
-//    给定一个循环数组 nums （ nums[nums.length - 1] 的下一个元素是 nums[0] ），返回 nums 中每个元素的 下一个更大元素 。
-//
-//    数字 x 的 下一个更大的元素 是按数组遍历顺序，这个数字之后的第一个比它更大的数，这意味着你应该循环地搜索它的下一个更大的数。如果不存在，则输出 -1 。
-//
-//    来源：力扣（LeetCode）
-//    链接：https://leetcode.cn/problems/next-greater-element-ii
-//    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+    //    "503. 下一个更大元素 II"
+    //    给定一个循环数组 nums （ nums[nums.length - 1] 的下一个元素是 nums[0] ），返回 nums 中每个元素的 下一个更大元素 。
+    //
+    //    数字 x 的 下一个更大的元素 是按数组遍历顺序，这个数字之后的第一个比它更大的数，这意味着你应该循环地搜索它的下一个更大的数。如果不存在，则输出 -1 。
+    //
+    //    来源：力扣（LeetCode）
+    //    链接：https://leetcode.cn/problems/next-greater-element-ii
+    //    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
     vector<int> nextGreaterElement2(vector<int> & nums){
         vector<int> input = nums;
         input.insert(input.end(), nums.begin(), nums.end());
@@ -1344,11 +1344,11 @@ public:
         return output;
     }
     
-//    "698. 划分为k个相等的子集"
-//    给定一个整数数组  nums 和一个正整数 k，找出是否有可能把这个数组分成 k 个非空子集，其总和都相等。
-//    参考：https://labuladong.github.io/algo/di-san-zha-24031/bao-li-sou-96f79/jing-dian--93320/
-//    解法：
-//        对于每一个数字来说，应该选择哪个桶。所以回溯backtrack写在数字的角度。
+    //    "698. 划分为k个相等的子集"
+    //    给定一个整数数组  nums 和一个正整数 k，找出是否有可能把这个数组分成 k 个非空子集，其总和都相等。
+    //    参考：https://labuladong.github.io/algo/di-san-zha-24031/bao-li-sou-96f79/jing-dian--93320/
+    //    解法：
+    //        对于每一个数字来说，应该选择哪个桶。所以回溯backtrack写在数字的角度。
     
     bool canPartitionKSubsets698(vector<int> & input, int k){
         
@@ -1363,7 +1363,7 @@ public:
     
     bool canPartitionKSubsets_backtrack(vector<int>& input, int index, int target, vector<int>& bucket){
         if(index == input.size()){
-//            到达最后一位数字的选择，此时如果已经选完，那么全部bucket应该是刚好填满
+            //            到达最后一位数字的选择，此时如果已经选完，那么全部bucket应该是刚好填满
             for(int i=0; i<bucket.size(); i++){
                 if(bucket[i]!=target){
                     return false;
@@ -1424,12 +1424,12 @@ public:
         return false;
     }
     
-//    "86. 分隔链表"
-//    给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
-//    你应当 保留 两个分区中每个节点的初始相对位置。
-//    来源：力扣（LeetCode）
-//    链接：https://leetcode.cn/problems/partition-list
-//    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+    //    "86. 分隔链表"
+    //    给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
+    //    你应当 保留 两个分区中每个节点的初始相对位置。
+    //    来源：力扣（LeetCode）
+    //    链接：https://leetcode.cn/problems/partition-list
+    //    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
     ListNode* partition86(ListNode* head, int x){
         // cur 指向 head，新建两个 listnode，分别用p1和p2来指向. 如果x值出现多次，如何保存？
         ListNode* curr = head;
@@ -1462,23 +1462,23 @@ public:
     }
     
     // 23. 合并K个升序链表
-//    给你一个链表数组，每个链表都已经按升序排列。
-//
-//    请你将所有链表合并到一个升序链表中，返回合并后的链表。
-//    输入：lists = [[1,4,5],[1,3,4],[2,6]]
-//    输出：[1,1,2,3,4,4,5,6]
-//    解释：链表数组如下：
-//    [
-//      1->4->5,
-//      1->3->4,
-//      2->6
-//    ]
-//    将它们合并到一个有序链表中得到。
-//    1->1->2->3->4->4->5->6
-//
-//    来源：力扣（LeetCode）
-//    链接：https://leetcode.cn/problems/merge-k-sorted-lists
-//    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+    //    给你一个链表数组，每个链表都已经按升序排列。
+    //
+    //    请你将所有链表合并到一个升序链表中，返回合并后的链表。
+    //    输入：lists = [[1,4,5],[1,3,4],[2,6]]
+    //    输出：[1,1,2,3,4,4,5,6]
+    //    解释：链表数组如下：
+    //    [
+    //      1->4->5,
+    //      1->3->4,
+    //      2->6
+    //    ]
+    //    将它们合并到一个有序链表中得到。
+    //    1->1->2->3->4->4->5->6
+    //
+    //    来源：力扣（LeetCode）
+    //    链接：https://leetcode.cn/problems/merge-k-sorted-lists
+    //    著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
     
     
     ListNode* mergeKLists(vector<ListNode*>& lists) {
@@ -1570,16 +1570,40 @@ public:
         ListNode* p1 = dummy;
         ListNode* p2 = dummy;
         while(p1!=nullptr){
-            if(p1->next!=nullptr){
-                p1 = p1->next->next;
-                p2 = p2->next;
-            }
+            if(p1->next!=nullptr){p1 = p1->next->next;p2 = p2->next;}
             else{
                 p2 = p2->next;
                 break;
             }
         }
         return p2;
+    }
+    
+    // 141. 环形链表
+    bool hasCycle_method1(ListNode *head) {
+        ListNode* p1 = head;
+        ListNode* p2 = head;
+        while(p1!=nullptr && p1->next!=nullptr){
+            p1 = p1->next->next;
+            p2 = p2->next;
+            if(p1==p2){
+                return true;
+            }
+        }
+        // 一旦为空，说明为非环
+        return false;
+    }
+    
+    bool hasCycle_method2(ListNode *head) {
+        unordered_set<ListNode*> seen;
+        while(head){
+            if(seen.count(head)){
+                return true;
+            }
+            seen.insert(head);
+            head = head->next;
+        }
+        return false;
     }
 };
 
