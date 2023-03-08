@@ -1660,8 +1660,54 @@ public:
                 if(p2==nullptr && c2==0){p2 = headA; c2++;}
             }
             return nullptr;
+    }
+    //    26. 删除有序数组中的重复项
+    int removeDuplicates(vector<int>& nums){
+        int n = nums.size();
+        if(n==0)return 0;
+        int slow = 0, fast = 0;
+        
+        while(fast < n){
+            if(nums[slow] != nums[fast]){
+                slow++;
+                nums[slow] = nums[fast];
+            }
+            fast++;
         }
+        return slow;
+    }
     
+    // 83. 删除排序链表中的重复元素
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == nullptr){return head;}
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while(fast != nullptr){
+            if(fast->val != slow->val){
+                slow = slow->next;
+                slow->val = fast->val;
+            }
+            fast = fast->next;
+        }
+        slow->next = nullptr;
+        return head;
+    }
+    
+    // 283. 移动零
+    void moveZeroes(vector<int>& nums) {
+        int n = nums.size();
+        // remove all zeros
+        int slow = 0, fast = 0;
+        while(fast < n){
+            if(nums[fast] != 0){
+                nums[slow] = nums[fast];
+                slow++;
+            }
+            fast++;
+        }
+        // add remain pos 0
+        for(int i = slow; i < n; i++){nums[i] = 0;}
+    }
 };
 
 
