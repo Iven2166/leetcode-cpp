@@ -192,6 +192,9 @@ public:
     
     
     //32. 最长有效括号
+    /*
+     给一个一堆括号的字符串，然后返回最长的合法的括号的长度。
+     */
     int longestValidParentheses(string s) {
         int n = s.size();
         int ans = 0;
@@ -827,6 +830,16 @@ public:
     }
     
     // 42. 接雨水
+    /*
+     给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+     输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]
+     输出：6
+     解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。da
+
+     来源：力扣（LeetCode）
+     链接：https://leetcode.cn/problems/trapping-rain-water
+     著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     */
     int trap1(vector<int>& height){
         /* 单调栈：是“逐层”地进行雨水统计的
          栈是存储val单调递减的数值
@@ -944,7 +957,7 @@ public:
     }
     
     // 3. 无重复字符的最长子串
-    int lengthOfLongestSubstring(string s) {
+    int lengthOfLongestSubstring1(string s) {
         if(s=="")
             return 0;
         // 从左到右遍历。用一个hashmap保存当前字符出现的最新位置 pos（应该是最右边）。查找当下位置i对应字符的pos，如果大于start，说明start应该更新为 pos+1；反之不理。pos所在字符的map-value更新为i
@@ -964,6 +977,38 @@ public:
                 len_max = i - start + 1;
         }
         return len_max;
+    }
+    
+    //3. 无重复字符的最长子串
+    /*
+     s = "abcabcbb", 有一个map记录移动窗口里，每个字母的出现次数。
+     用while进行，如果right处有字母出现2次，则字典里减去窗口的left所占字母，并且left向右移动，直到right所占字母的次数=1为止
+     全程的res=max(res, right-left)
+     */
+    int lengthOfLongestSubstring2(string s){
+        unordered_map<char, int> str_cnt;
+        int left = 0, right = 0;
+        int res = 0;
+        int len = s.size();
+        while(right < len){
+            // c 是即将进入窗口的字符
+            char c = s[right];
+            // 窗口右开侧准备右翼
+            right++;
+            // 进行窗口内数据的更新
+            if(str_cnt.count(c)){
+                str_cnt[c]++;
+            }
+            else{str_cnt[c] = 1;}
+            // 开始判断是否需要向右收缩窗口
+            while(str_cnt[c] > 1){
+                str_cnt[s[left]]--;
+                left++;
+            }
+            // 合法的窗口
+            res = max(res, right - left);
+        }
+        return res;
     }
     
     
@@ -1707,6 +1752,82 @@ public:
         }
         // add remain pos 0
         for(int i = slow; i < n; i++){nums[i] = 0;}
+    }
+    
+    //    1625. 执行操作后字典序最小的字符串
+    string findLexSmallestString(string s, int a, int b) {
+        // 枚举
+        int n = s.size();
+        vector<int> vis(n);
+        string res = s;
+        s = s + s; // 类似回文的操作，便于查找
+        
+        for(int i = 0; vis[i] == 0; i = (i + b) % n){
+            vis[i] = 1;
+            for(int j = 0; j < 10; j++){
+                int k_limit = b % 2 == 0 ? 0 : 9;
+                for(int k = 0; k <= k_limit; k++){
+                    string tmp = s.substr(i, n);
+                    for(int p = 1; p < n; p += 2){
+                        tmp[p] = '0' + (tmp[p] - '0' + j * a) % 10;
+                    }
+                    for(int p = 0; p < n; p += 2){
+                        tmp[p] = '0' + (tmp[p] - '0' + k * a) % 10;
+                    }
+                    res = min(tmp, res);
+                }
+            }
+        }
+        
+        return res;
+    }
+    
+    // 76. 最小覆盖子串
+    /*
+     输入：s = "ADOBECODEBANC", t = "ABC"
+     输出："BANC"
+     解释：最小覆盖子串 "BANC" 包含来自字符串 t 的 'A'、'B' 和 'C'。
+
+     来源：力扣（LeetCode）
+     链接：https://leetcode.cn/problems/minimum-window-substring
+     著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     */
+    string minWindow(string s, string t){
+        unordered_map<char, int> window, need;
+        int left = 0, right = 0;
+        int valid = 0;  // 用以记录当前窗口满足的覆盖字母去重个数
+        int start = 0, len = INT_MAX;
+        for(char i: t){need[i]++;}
+        while(right < s.size()){
+            // 即将进入窗口的字符
+            char c = s[right];
+            right++;
+            // 开始更新窗口状态,只更新我们关心的字母
+            if(need.count(c)){
+                window[c]++;
+                if(window[c]==need[c]) // 如果相等，仅会发生一次。加法无需判断，减法（left右移情况）会单独判断
+                    valid++;
+            }
+            // 开始判断是否能够缩小窗口，右移left
+            while(need.size()==valid){
+                // 由于窗口已经满足条件，在这里更新最小覆盖区间的答案
+                if(right - left < len){
+                    len = right - left;
+                    start = left;
+                }
+                // 即将离开窗口的字符
+                char d = s[left];
+                left++;
+                // 离开后判断这个窗口是否会有关心字母的减少
+                // 注意**：这里是跟上述更新窗口状态反过来的
+                if(need.count(d)){
+                    if(window[d]==need[d])
+                        valid--;
+                    window[d]--;
+                }
+            }
+        }
+        return len==INT_MAX ? "" : s.substr(start, len);
     }
 };
 
