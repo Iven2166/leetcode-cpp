@@ -1829,6 +1829,70 @@ public:
         }
         return len==INT_MAX ? "" : s.substr(start, len);
     }
+    
+    // 567. 字符串的排列
+    bool checkInclusion(string t, string s) {
+        unordered_map<char, int> window, need;
+        int left = 0, right = 0;
+        int valid = 0;
+        for(auto i: t){need[i]++;}
+        while(right < s.size()){
+            char c = s[right];
+            right++;
+            // 判断窗口状态
+            if(need.count(c)){
+                window[c]++;
+                if(window[c]==need[c]) valid++;
+            }
+            // 判断是否需要收缩窗口，保持定长的窗口 t.size()
+            while(right - left >= t.size()){
+                if(valid==need.size()) return true; // 这其实发生于 right - left == t.size()
+                // 否则应该收缩窗口
+                char d = s[left];
+                left++;
+                if(need.count(d)){
+                    if(window[d]==need[d]) valid--;
+                    window[d]--;
+                }
+            }
+        }
+        return false;
+    }
+    
+    // 167. 两数之和 II - 输入有序数组
+    vector<int> twoSum167(vector<int>& numbers, int target) {
+        int left = 0, right = numbers.size() - 1;
+        int res1 = -1, res2 = -1;
+        while(left < right){
+            int sum = numbers[left] + numbers[right];
+            if(sum == target){
+                return {left+1, right+1};
+            }
+            else if(sum > target){right--;}
+            else{left++;}
+        }
+        return {-1,-1};
+    }
+    
+    //5. 最长回文子串
+    string longestPalindrome(string s) {
+        string res = "";
+        for(int i=0; i<s.size(); i++){
+            string res1 = longestPalindromeCore(s, i, i);
+            string res2 = longestPalindromeCore(s, i, i+1);
+            res = (res.size() < res1.size()) ? res1 : res;
+            res = (res.size() < res2.size()) ? res2 : res;
+        }
+        return res;
+    }
+    
+    // 先查找以中心向两端扩散的字符串
+    string longestPalindromeCore(string s, int l, int r){
+        while(l >= 0 && r <= s.size() - 1 && s[l]==s[r]){
+            l--; r++;
+        }
+        return s.substr(l + 1, r - l - 1);  // 比如 l=0,r=0,则l=-1,r=1,应该是 l+1=0,r-l-1=1
+    }
 };
 
 
