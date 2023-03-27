@@ -1875,7 +1875,7 @@ public:
     }
     
     //5. 最长回文子串
-    string longestPalindrome(string s) {
+    string longestPalindrome5(string s) {
         string res = "";
         for(int i=0; i<s.size(); i++){
             string res1 = longestPalindromeCore(s, i, i);
@@ -1893,7 +1893,177 @@ public:
         }
         return s.substr(l + 1, r - l - 1);  // 比如 l=0,r=0,则l=-1,r=1,应该是 l+1=0,r-l-1=1
     }
+    
+public:
+    vector<vector<string>> res;
+    deque<string> track;  // 路径存放
+    bool ifPalindrome(string s, int l, int r){
+        while(l <= r){
+            if(s[l]==s[r]){l++; r--;}
+            else{return false;}
+        }
+        return true;
+    }
+    vector<vector<int>> partition131DPmap_init(string s){
+        vector<vector<int>> partition131DPmap(s.size(), vector<int>(s.size(), 1));
+        for(int i = s.size() - 1; i > -1; i--){
+            for(int j = i + 1; j < s.size(); j++){
+                if(j < s.size() && s[i] == s[j] && partition131DPmap[i+1][j-1] == 1){
+                    partition131DPmap[i][j] = 1;
+                }
+                else{
+                    partition131DPmap[i][j] = 0;
+                }
+            }
+        }
+        return partition131DPmap;
+    }
+    void partition131_backtrack(string s, int start){
+        if(start == s.size()){
+            // 到达叶子节点，将答案放到res里
+            res.push_back(vector<string>(track.begin(), track.end()));
+            return ;
+        }
+        // 还有之后的节点要走
+        for(int i = start; i < s.size(); i++){
+            if(!ifPalindrome(s, start, i)){
+                continue;
+            }
+            // s[start:i] 是一个回文串（可以分割？）
+            // 做选择
+            track.push_back(s.substr(start, i - start + 1));
+            // 进入下一层：继续切分 s[i+1:]
+            partition131_backtrack(s, i+1);
+            track.pop_back();
+        }
+    }
+    
+public:
+    // 131. 分割回文串
+    vector<vector<string>> partition131(string s) {
+        partition131_backtrack(s, 0);
+        return res;
+    }
+
+    // 658. 找到 K 个最接近的元素
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        // 二分查找: arr 分为 [0,left] < x，[right,n-1]>x
+        // 然后再双指针查找两侧
+        int right = lower_bound(arr.begin(), arr.end(), x) - arr.begin();
+        int left = right - 1;
+        while(k--){
+            if(left < 0){
+                right++; // 左指针超过边界
+            }
+            else if(right >= arr.size()){
+                left--; //右指针超过边界
+            }
+            else if(x - arr[left] <= arr[right] - x){
+                left--;
+            }
+            else{
+                right++;
+            }
+        }
+        vector<int> res = vector<int>(arr.begin() + left + 1, arr.begin() + right);
+        return res;
+    }
+    
+private:
+    bool findClosestElements_CompareLarger(int a, int b, int x){
+        return (abs(a - x) < abs(b - x) || (a < b && abs(a - x)==abs(b - x)));
+    }
+public:
+    // 658. 找到 K 个最接近的元素 --->看下自己写的复杂程度！！！
+    vector<int> findClosestElements_wrotemyself(vector<int>& arr, int k, int x) {
+        /* 有点像寻找最长回文子串？
+         1、找到“中心点”：双指针，left和right，如果相同说明应该是本身，如果不是则是两个选择
+         2、向左右扩散，并且比较左右指针的大小（符合规则），或者边界，来决定如何移动指针
+         3、arr的两个指针范围，应该是连续的子数组
+        */
+        int left = 0, right = arr.size() - 1;
+        int begin_left = 0, begin_right = arr.size() - 1;
+        int left_gap_min = INT_MAX, right_gap_min = INT_MAX;
+        int left_gap = 0, right_gap = 0;
+        while(left <= right){
+            left_gap = abs(x - arr[left]);
+            right_gap = abs(x - arr[right]);
+            if(left_gap_min > left_gap){
+                left_gap_min = left_gap;
+                begin_left = left;
+                left++;
+            }
+            if(right_gap_min > right_gap){
+                right_gap_min = right_gap;
+                begin_right = right;
+                right--;
+            }
+        }
+        vector<int> res(k, 0);
+        if(k==1){
+            if(begin_left==begin_right){return {arr[begin_left]};}
+            else{
+                if(findClosestElements_CompareLarger(arr[begin_left],arr[begin_right],x)){
+                    return {arr[begin_left]};
+                }
+                return {arr[begin_right]};
+            }
+        }
+        int res_left = 0, res_right = arr.size() - 1;
+        int l = begin_left, r = begin_right;
+        while(k > 0){
+            if(l == r){
+                res_left = l; res_right = r;
+                l--; r++; k--;}
+            else{
+                if(findClosestElements_CompareLarger(arr[l], arr[r], x)){
+                    res_left = l;
+                    l--; k--;
+                }
+                else{
+                    res_right = r;
+                    r++; k--;
+                }
+            }
+        }
+        int pos = res_left;
+        for(int i=0; i<res.size(); i++){
+            res[i] = arr[pos];
+            pos++;
+        }
+        return res;
+//        return {arr[begin_left], arr[begin_right]};
+    }
 };
 
+// 281. 锯齿迭代器
+class ZigzagIterator {
+    int state = 0, res;
+    vector<int>::iterator p1, p2, end1, end2;
+public:
+    ZigzagIterator(vector<int>& v1, vector<int>& v2) {
+        p1 = v1.begin();
+        p2 = v2.begin();
+        end1 = v1.end();
+        end2 = v2.end();
+    }
+    int next() {
+        if((p2 != end2 && state) || (p1==end1)){
+            // p1为空，或者轮到p2且p2不为空
+            res = *p2;
+            p2++;
+        }
+        else{
+            res = *p1;
+            p1++;
+        }
+        state ^= 1;
+        return res;
+    }
+    bool hasNext() {
+        if(p1 == end1 && p2 == end2){return false;}
+        return true;
+    }
+};
 
 #endif /* Solution_hpp */
