@@ -1723,7 +1723,7 @@ public:
     }
     
     // 83. 删除排序链表中的重复元素
-    ListNode* deleteDuplicates(ListNode* head) {
+    ListNode* deleteDuplicates83(ListNode* head) {
         if(head == nullptr){return head;}
         ListNode* slow = head;
         ListNode* fast = head;
@@ -2033,6 +2033,53 @@ public:
         }
         return res;
 //        return {arr[begin_left], arr[begin_right]};
+    }
+    
+    //  82. 删除排序链表中的重复元素 II
+    ListNode* deleteDuplicates82(ListNode* head) {
+        ListNode* dummy = new ListNode(-101, head);
+        ListNode* p = dummy;
+        while(p->next && p->next->next){
+            if(p->next->val == p->next->next->val){
+                int x = p->next->val;
+                while(p->next && p->next->val == x){
+                    p->next = p->next->next;
+                }
+            }
+            else{
+                p = p->next;
+            }
+        }
+        return dummy->next;
+    }
+    
+    // 543. 二叉树的直径
+    int diameterOfBinaryTreeRes = 0;
+    int diameterOfBinaryTreeBase(TreeNode* root){
+        if(root==nullptr) return 0;
+        int left = diameterOfBinaryTreeBase(root->left);
+        int right = diameterOfBinaryTreeBase(root->right);
+        diameterOfBinaryTreeRes = (left + right > diameterOfBinaryTreeRes) ? left + right : diameterOfBinaryTreeRes;
+        return 1 + max(left, right);
+    }
+    int diameterOfBinaryTree(TreeNode* root) {
+        // 每个节点左右总共有多少个节点
+        diameterOfBinaryTreeBase(root);
+        return diameterOfBinaryTreeRes;
+    }
+    
+    //236. 二叉树的最近公共祖先
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root==nullptr){return nullptr;}
+        if(root == p || root == q){
+            return root;
+        }
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+        if(left != nullptr && right != nullptr){return root;} // 一个在左，一个在右
+        if(left != nullptr){return left;}
+        if(right != nullptr){return right;}
+        return nullptr;
     }
 };
 
