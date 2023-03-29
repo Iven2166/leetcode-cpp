@@ -27,6 +27,15 @@ struct ListNode{
     ListNode(int x, ListNode* next): val(x), next(next) {}
 };
 
+class Node{
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* parent;
+}
+
+
 struct TreeNode{
     int val;
     TreeNode* left;
@@ -2079,6 +2088,22 @@ public:
         if(left != nullptr && right != nullptr){return root;} // 一个在左，一个在右
         if(left != nullptr){return left;}
         if(right != nullptr){return right;}
+        return nullptr;
+    }
+    
+    // 1650. 二叉树的最近公共祖先 III
+    Node* lowestCommonAncestor(Node* p, Node * q) {
+        unordered_set<int> set;
+        while(p){
+            set.insert(p->val);
+            p = p->parent;
+        }
+        while(q){
+            if(set.find(q->val) != set.end()){
+                return q;
+            }
+            q = q->parent;
+        }
         return nullptr;
     }
 };
