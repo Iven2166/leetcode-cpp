@@ -2106,7 +2106,36 @@ public:
         }
         return nullptr;
     }
+    
+    // 322. 零钱兑换
+    int coinChange(vector<int>& coins, int k){
+        if(k==0){return 0;}
+        // 比如 coins = {1,3,5}, k=11，则要么先到达 11-1=10, 11-3=8,11-5=6，这里消耗了一个硬币，再进行细拆
+        int max = k + 1;
+        vector<int> dp(k+1, max);
+        dp[0] = 0;
+        // for(auto i: coins){dp[i] = 1;} // 一枚硬币即可
+        for(int i = 0; i < k+1; i++){
+            for(auto c: coins){
+                if(i >= c) dp[i] = min(dp[i], dp[i-c] + 1);
+            }
+        }
+        return  (dp[k] > k)? -1: dp[k];
+    }
 };
+
+// 重载运算符号：打印 vector<vector<int>>
+ostream &operator<<(ostream &output, const vector<vector<int>> &input)
+{
+   for(auto vec:input){
+       cout << endl;
+       for(auto i: vec){
+           cout << i << ',';
+       }
+   }
+   return output;
+}
+
 
 // 281. 锯齿迭代器
 class ZigzagIterator {
