@@ -2122,6 +2122,114 @@ public:
         }
         return  (dp[k] > k)? -1: dp[k];
     }
+    
+    // 39. 组合总和
+    /*
+     candidates = [2,3,6,7], target = 7
+     
+     */
+private:
+    vector<vector<int>> combinationSumRes;
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target){
+        vector<int> stk;
+        combinationSumCore(candidates, target, stk, 0);
+        return combinationSumRes;
+    }
+    void combinationSumCore(vector<int>& candidates, int remain, vector<int> stk, int idx){
+        if(remain == 0){
+            combinationSumRes.push_back(stk);
+            return;
+        }
+        if(remain < 0){return;}
+        if(idx >= candidates.size()){return;}
+        for(int i=idx; i<candidates.size(); i++){
+            stk.push_back(candidates[i]);
+            combinationSumCore(candidates, remain - candidates[i], stk, i);
+            stk.pop_back();
+        }
+    }
+    
+    // 40. 组合总和 II
+private:
+    vector<vector<int>> combinationSum2Res;
+    vector<pair<int,int>> cnt;
+    vector<int> tmp;
+public:
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        sort(candidates.begin(), candidates.end());
+        for(auto i:candidates){
+            if(cnt.empty() || cnt.back().first != i){
+                cnt.push_back(make_pair(i,1));
+//                 cnt.emplace_back(i,1);
+            }
+            else{
+                ++cnt.back().second;
+            }
+        }
+        combinationSum2Core(0, target);
+        return combinationSum2Res;
+    }
+    void combinationSum2Core(int idx, int remain){
+        if(remain == 0){
+            combinationSum2Res.push_back(tmp);
+            return ;
+        }
+        if(remain < 0) return;
+        if(idx == cnt.size() || remain < cnt[idx].first){return;}
+        
+        combinationSum2Core(idx+1, remain); // 不使用以下的数
+        // i 在此是使用该数的次数
+        int most = min(remain / cnt[idx].first, cnt[idx].second);
+        for(int i=1; i<=most; ++i){
+            tmp.push_back(cnt[idx].first);
+            combinationSum2Core(idx+1, remain - cnt[idx].first * i);
+        }
+        for(int j=1; j<=most; j++){
+            tmp.pop_back();
+        }
+    }
+    
+    /*
+     216. 组合总和 III
+     找出所有相加之和为 n 的 k 个数的组合，且满足下列条件：
+     只使用数字1到9,每个数字 最多使用一次
+     返回 所有可能的有效组合的列表 。该列表不能包含相同的组合两次，组合可以以任何顺序返回。
+
+     来源：力扣（LeetCode）
+     链接：https://leetcode.cn/problems/combination-sum-iii
+     著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     输入: k = 3, n = 9
+     输出: [[1,2,6], [1,3,5], [2,3,4]]
+     解释:
+     1 + 2 + 6 = 9
+     1 + 3 + 5 = 9
+     2 + 3 + 4 = 9
+     没有其他符合的组合了。
+     */
+private:
+    vector<vector<int>> combinationSum3res;
+    vector<int> combinationSum3tmp;
+    
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        combinationSum3core(1, n, k);
+        return combinationSum3res;
+    }
+    void combinationSum3core(int num, int remain, int k){
+        // num: the current num between 1 and 9
+        if(remain == 0 && combinationSum3tmp.size() == k){
+            combinationSum3res.push_back(combinationSum3tmp);
+            return;
+        }
+        if(remain < 0 || combinationSum3tmp.size() > k || num > 9){return;}
+        combinationSum3core(num+1, remain, k);
+//        for(int i = num + 1; i < 10; i++){
+        combinationSum3tmp.push_back(num);
+        combinationSum3core(num+1, remain-num, k);
+        combinationSum3tmp.pop_back();
+//        }
+    }
 };
 
 // 重载运算符号：打印 vector<vector<int>>
