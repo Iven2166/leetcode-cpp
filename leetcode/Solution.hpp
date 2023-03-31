@@ -2230,6 +2230,40 @@ public:
         combinationSum3tmp.pop_back();
 //        }
     }
+    
+    
+    // 78. 子集
+private:
+    vector<vector<int>> subsetsres;
+    vector<int> subsetstmp;
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        subsetsCore_1(0, nums);
+        return subsetsres;
+    }
+    
+    // 写法1
+    void subsetsCore_1(int idx, vector<int>& nums){
+        if(idx == nums.size()){
+            subsetsres.push_back(subsetstmp);
+            return;
+        }
+        subsetstmp.push_back(nums[idx]);
+        subsetsCore_1(idx + 1, nums);
+        subsetstmp.pop_back();
+    }
+    
+    // 写法2
+    void subsetsCore_2(int idx, vector<int>& nums){
+        subsetsres.push_back(subsetstmp);
+        for(int i=idx; i<nums.size(); i++){
+            subsetstmp.push_back(nums[i]);
+            subsetsCore_2(i + 1, nums);
+            subsetstmp.pop_back();
+            subsetsCore_2(i + 1, nums);
+        }
+    }
+    
 };
 
 // 重载运算符号：打印 vector<vector<int>>
