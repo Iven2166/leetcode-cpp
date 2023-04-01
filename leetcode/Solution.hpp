@@ -2150,44 +2150,104 @@ public:
         }
     }
     
-    // 40. 组合总和 II
+    /*
+     40. 组合总和 II
+     给定一个候选人编号的集合 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
+     candidates 中的每个数字在每个组合中只能使用 一次 。
+     注意：解集不能包含重复的组合。
+
+     输入: candidates = [10,1,2,7,6,1,5], target = 8,
+     输出:
+     [
+     [1,1,6],
+     [1,2,5],
+     [1,7],
+     [2,6]
+     ]
+     链接：https://leetcode.cn/problems/combination-sum-ii
+     */
 private:
-    vector<vector<int>> combinationSum2Res;
-    vector<pair<int,int>> cnt;
-    vector<int> tmp;
+    vector<vector<int>> combinationSum2res;
+    vector<int> combinationSum2tmp;
+    int combinationSum2CurrentSum = 0;
 public:
     vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
         sort(candidates.begin(), candidates.end());
-        for(auto i:candidates){
-            if(cnt.empty() || cnt.back().first != i){
-                cnt.push_back(make_pair(i,1));
-//                 cnt.emplace_back(i,1);
+        combinationSum2Backtrack(0, candidates, target);
+        return combinationSum2res;
+    }
+    
+    void combinationSum2Backtrack(int idx, vector<int>& candidates, int target){
+        // idx 为start 的位置
+        if(combinationSum2CurrentSum==target){
+            combinationSum2res.emplace_back(combinationSum2tmp);
+            return;
+        }
+        if(combinationSum2CurrentSum>target){return;}
+        for(int i=idx; i<candidates.size(); i++){
+            if(i > idx && candidates[i]==candidates[i-1]){
+                continue;
             }
             else{
-                ++cnt.back().second;
+                combinationSum2tmp.emplace_back(candidates[i]);
+                combinationSum2CurrentSum += candidates[i];
+                combinationSum2Backtrack(i+1, candidates, target);
+                combinationSum2CurrentSum -= candidates[i];
+                combinationSum2tmp.pop_back();
             }
         }
-        combinationSum2Core(0, target);
-        return combinationSum2Res;
     }
-    void combinationSum2Core(int idx, int remain){
-        if(remain == 0){
-            combinationSum2Res.push_back(tmp);
-            return ;
+    
+    /*
+     47. 全排列 II
+     给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
+     示例 1：
+     输入：nums = [1,1,2]
+     输出：
+     [[1,1,2],
+      [1,2,1],
+      [2,1,1]]
+     示例 2：
+     输入：nums = [1,2,3]
+     输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+     来源：力扣（LeetCode）
+     链接：https://leetcode.cn/problems/permutations-ii
+     */
+private:
+    vector<vector<int>> permuteUniqueRes;
+    vector<int> permuteUniqueTmp;
+    unordered_map<int, bool> permuteUniqueused;
+    
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums){
+        sort(nums.begin(), nums.end());
+        permuteUniqueCore(nums);
+        return permuteUniqueRes;
+    }
+    
+    void permuteUniqueCore(vector<int>& nums){
+        if(permuteUniqueTmp.size()==nums.size()){
+            permuteUniqueRes.emplace_back(permuteUniqueTmp);
+            return;
         }
-        if(remain < 0) return;
-        if(idx == cnt.size() || remain < cnt[idx].first){return;}
+        // 遍历没有使用过的元素
+        for(int i=0; i<nums.size();i++){
+            if(permuteUniqueused[i])
+                continue;
+            // 新添加的剪枝逻辑，固定相同的元素在排列中的相对位置
+            if(i > 0 && nums[i] == nums[i-1] && !permuteUniqueused[i-1]){
+                continue;
+            }
+            else{
+                // 选择 nums[i]
+                permuteUniqueTmp.push_back(nums[i]);
+                permuteUniqueused[i] = true;
+                permuteUniqueCore(nums);
+                permuteUniqueused[i] = false;
+                permuteUniqueTmp.pop_back();
+            }
+        }
         
-        combinationSum2Core(idx+1, remain); // 不使用以下的数
-        // i 在此是使用该数的次数
-        int most = min(remain / cnt[idx].first, cnt[idx].second);
-        for(int i=1; i<=most; ++i){
-            tmp.push_back(cnt[idx].first);
-            combinationSum2Core(idx+1, remain - cnt[idx].first * i);
-        }
-        for(int j=1; j<=most; j++){
-            tmp.pop_back();
-        }
     }
     
     /*
@@ -2261,6 +2321,75 @@ public:
             subsetsCore_2(i + 1, nums);
             subsetstmp.pop_back();
             subsetsCore_2(i + 1, nums);
+        }
+    }
+    
+    /*
+     46. 全排列
+     给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
+     输入：nums = [1,2,3]
+     输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+     https://leetcode.cn/problems/permutations/
+     */
+private:
+    vector<vector<int>> premuteres;
+    vector<int> premutetmp;
+    unordered_map<int, bool> premuteused;
+public:
+    vector<vector<int>> premute(vector<int>& nums){
+        premutebacktrack(nums);
+        return premuteres;
+    }
+    
+    void premutebacktrack(vector<int>& nums){
+        if(premutetmp.size()==nums.size()){
+            premuteres.push_back(premutetmp);
+            return;
+        }
+        
+        for(int i=0; i<nums.size(); i++){
+            if(!premuteused[i]){
+                premuteused[i] = true;
+                premutetmp.push_back(nums[i]);
+                premutebacktrack(nums);
+                premutetmp.pop_back();
+                premuteused[i] = false;
+            }
+        }
+    }
+    
+    /*
+     90. 子集 II
+     给你一个整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。
+     解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
+     输入：nums = [1,2,2]
+     输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
+     链接：https://leetcode.cn/problems/subsets-ii
+     */
+private:
+    vector<vector<int>> subsetsWithDupres;
+    vector<int> subsetsWithDuptmp;
+    unordered_map<int, bool> subsetsWithDupused;
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        subsetsWithDupBacktrack(0, nums);
+        return subsetsWithDupres;
+    }
+    
+    void subsetsWithDupBacktrack(int idx, vector<int>& nums){
+        // idx 当前的位置
+        subsetsWithDupres.push_back(subsetsWithDuptmp);
+        for(int i=idx; i<nums.size(); i++){
+            if(i>0 && nums[i]==nums[i-1]){
+                continue;
+            }
+            else{
+                subsetsWithDuptmp.push_back(nums[i]);
+                subsetsWithDupBacktrack(i+1, nums);
+                subsetsWithDuptmp.pop_back();
+                subsetsWithDupBacktrack(i+1, nums);
+            }
         }
     }
     
