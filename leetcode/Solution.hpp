@@ -2198,57 +2198,7 @@ public:
         }
     }
     
-    /*
-     47. 全排列 II
-     给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
-     示例 1：
-     输入：nums = [1,1,2]
-     输出：
-     [[1,1,2],
-      [1,2,1],
-      [2,1,1]]
-     示例 2：
-     输入：nums = [1,2,3]
-     输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
-     来源：力扣（LeetCode）
-     链接：https://leetcode.cn/problems/permutations-ii
-     */
-private:
-    vector<vector<int>> permuteUniqueRes;
-    vector<int> permuteUniqueTmp;
-    unordered_map<int, bool> permuteUniqueused;
     
-public:
-    vector<vector<int>> permuteUnique(vector<int>& nums){
-        sort(nums.begin(), nums.end());
-        permuteUniqueCore(nums);
-        return permuteUniqueRes;
-    }
-    
-    void permuteUniqueCore(vector<int>& nums){
-        if(permuteUniqueTmp.size()==nums.size()){
-            permuteUniqueRes.emplace_back(permuteUniqueTmp);
-            return;
-        }
-        // 遍历没有使用过的元素
-        for(int i=0; i<nums.size();i++){
-            if(permuteUniqueused[i])
-                continue;
-            // 新添加的剪枝逻辑，固定相同的元素在排列中的相对位置
-            if(i > 0 && nums[i] == nums[i-1] && !permuteUniqueused[i-1]){
-                continue; // 如果 permuteUniqueused[i-1] == true，代表i-1已被使用过，则继续往下走。没使用过说明 i 不应该在 i-1 前面使用，continue中止i的选择。所以这里是固定了相对位置
-            }
-            else{
-                // 选择 nums[i]
-                permuteUniqueTmp.push_back(nums[i]);
-                permuteUniqueused[i] = true;
-                permuteUniqueCore(nums);
-                permuteUniqueused[i] = false;
-                permuteUniqueTmp.pop_back();
-            }
-        }
-        
-    }
     
     /*
      216. 组合总和 III
@@ -2356,6 +2306,58 @@ public:
                 premuteused[i] = false;
             }
         }
+    }
+    
+    /*
+     47. 全排列 II
+     给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
+     示例 1：
+     输入：nums = [1,1,2]
+     输出：
+     [[1,1,2],
+      [1,2,1],
+      [2,1,1]]
+     示例 2：
+     输入：nums = [1,2,3]
+     输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+     来源：力扣（LeetCode）
+     链接：https://leetcode.cn/problems/permutations-ii
+     */
+private:
+    vector<vector<int>> permuteUniqueRes;
+    vector<int> permuteUniqueTmp;
+    unordered_map<int, bool> permuteUniqueused;
+    
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums){
+        sort(nums.begin(), nums.end());
+        permuteUniqueCore(nums);
+        return permuteUniqueRes;
+    }
+    
+    void permuteUniqueCore(vector<int>& nums){
+        if(permuteUniqueTmp.size()==nums.size()){
+            permuteUniqueRes.emplace_back(permuteUniqueTmp);
+            return;
+        }
+        // 遍历没有使用过的元素
+        for(int i=0; i<nums.size();i++){
+            if(permuteUniqueused[i])
+                continue;
+            // 新添加的剪枝逻辑，固定相同的元素在排列中的相对位置
+            if(i > 0 && nums[i] == nums[i-1] && !permuteUniqueused[i-1]){
+                continue; // 如果 permuteUniqueused[i-1] == true，代表i-1已被使用过，则继续往下走。没使用过说明 i 不应该在 i-1 前面使用，continue中止i的选择。所以这里是固定了相对位置
+            }
+            else{
+                // 选择 nums[i]
+                permuteUniqueTmp.push_back(nums[i]);
+                permuteUniqueused[i] = true;
+                permuteUniqueCore(nums);
+                permuteUniqueused[i] = false;
+                permuteUniqueTmp.pop_back();
+            }
+        }
+        
     }
     
     /*
