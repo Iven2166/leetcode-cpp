@@ -2236,7 +2236,7 @@ public:
                 continue;
             // 新添加的剪枝逻辑，固定相同的元素在排列中的相对位置
             if(i > 0 && nums[i] == nums[i-1] && !permuteUniqueused[i-1]){
-                continue;
+                continue; // 如果 permuteUniqueused[i-1] == true，代表i-1已被使用过，则继续往下走。没使用过说明 i 不应该在 i-1 前面使用，continue中止i的选择。所以这里是固定了相对位置
             }
             else{
                 // 选择 nums[i]
