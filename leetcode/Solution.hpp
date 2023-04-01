@@ -33,7 +33,7 @@ public:
     Node* left;
     Node* right;
     Node* parent;
-}
+};
 
 
 struct TreeNode{
