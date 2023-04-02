@@ -2126,7 +2126,17 @@ public:
     // 39. 组合总和
     /*
      candidates = [2,3,6,7], target = 7
-     
+     给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
+     candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
+     对于给定的输入，保证和为 target 的不同组合数少于 150 个。
+     示例 1：
+     输入：candidates = [2,3,6,7], target = 7
+     输出：[[2,2,3],[7]]
+     解释：
+     2 和 3 可以形成一组候选，2 + 2 + 3 = 7 。注意 2 可以使用多次。
+     7 也是一个候选， 7 = 7 。
+     仅有这两种组合。
+     链接：https://leetcode.cn/problems/combination-sum
      */
 private:
     vector<vector<int>> combinationSumRes;
@@ -2395,6 +2405,80 @@ public:
         }
     }
     
+    /* 752. 打开转盘锁
+     你有一个带有四个圆形拨轮的转盘锁。每个拨轮都有10个数字： '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' 。每个拨轮可以自由旋转：例如把 '9' 变为 '0'，'0' 变为 '9' 。每次旋转都只能旋转一个拨轮的一位数字。
+     锁的初始数字为 '0000' ，一个代表四个拨轮的数字的字符串。
+     列表 deadends 包含了一组死亡数字，一旦拨轮的数字和列表里的任何一个元素相同，这个锁将会被永久锁定，无法再被旋转。
+     字符串 target 代表可以解锁的数字，你需要给出解锁需要的最小旋转次数，如果无论如何不能解锁，返回 -1 。
+
+     输入：deadends = ["0201","0101","0102","1212","2002"], target = "0202"
+     输出：6
+     可能的移动序列为 "0000" -> "1000" -> "1100" -> "1200" -> "1201" -> "1202" -> "0202"。
+     注意 "0000" -> "0001" -> "0002" -> "0102" -> "0202" 这样的序列是不能解锁的，
+     因为当拨动到 "0102" 时这个锁就会被锁定。
+
+     链接：https://leetcode.cn/problems/open-the-lock
+    */
+private:
+    string minusOne(string cur, int idx) {
+        string temp = cur;
+        if (temp[idx] == '0')temp[idx] = '9';
+        else temp[idx] -= 1;
+        return temp;
+    }
+    string plusOne(string cur, int idx) {
+        string temp = cur;
+        if (temp[idx] == '9')temp[idx] = '0';
+        else temp[idx] += 1;
+        return temp;
+    }
+    // 以下的 minusOne 是会报错的
+    // string minusOne(string s, int j) {
+    //     char ch[s.length()];
+    //     strcpy(ch, s.c_str());
+    //     if (ch[j] == '0')
+    //         ch[j] = '9';
+    //     else
+    //         ch[j] -= 1;
+    //     string res(ch);
+    //     return res;
+    // }
+
+public:
+    int openLock(vector<string>& deadends, string target) {  //BFS广度优先遍历
+        queue<string> node;
+        unordered_set<string> dead;
+        unordered_set<string> visited;
+        for(auto s:deadends){
+            dead.insert(s);
+        }
+        int step = 0;
+        node.push("0000");
+        visited.insert("0000");
+        while(!node.empty()){
+            int size = node.size();
+            for(int i=0;i<size;i++){
+                string cur = node.front();
+                node.pop();
+                if(dead.find(cur)!=dead.end()) continue;
+                if(cur == target) return step;
+                for(int j = 0;j<4;j++){
+                    string up = plusOne(cur, j);
+                    if (!visited.count(up)) {
+                        node.push(up);
+                        visited.insert(up);
+                    }
+                    string down = minusOne(cur, j);
+                    if (!visited.count(down)) {
+                        node.push(down);
+                        visited.insert(down);
+                    }
+                }
+            }
+            step++;
+        }
+        return -1;
+    }
 };
 
 // 重载运算符号：打印 vector<vector<int>>
