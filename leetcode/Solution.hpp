@@ -2479,6 +2479,28 @@ public:
         }
         return -1;
     }
+    
+    // 6362. 最长平衡子字符串
+    int findTheLongestBalancedSubstring(string s) {
+       int pre = 0, cur = 0, ans = 0;
+       for(int i=0; i<s.size(); i++){
+           cur++; // 记录连续的0或者1个数
+           if(i == s.size() - 1 || s[i] != s[i+1]){
+               // 01 或者 10
+               if(s[i] == '1'){
+                   // 结算
+                   ans = max(ans, 2 * min(cur, pre));  // 在此，pre为连续0个数，cur为连续1个数
+                   pre = 0;
+                   cur = 0;
+               }
+               else{
+                   pre = cur; // 至此，cur记录的是0连续个数，用pre保留
+                   cur = 0; // 切换到 1 计数
+               }
+           }
+       }
+       return ans;
+   }
 };
 
 // 重载运算符号：打印 vector<vector<int>>
