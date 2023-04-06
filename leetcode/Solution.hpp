@@ -2690,6 +2690,31 @@ public:
     }
     
     /*
+     123. 买卖股票的最佳时机 III
+     */
+    int maxProfit_123_1(vector<int>& prices){
+        int n = prices.size();
+        int max_k = 2;
+        // dp[i][k][0 or 1]
+        vector<vector<vector<int>>> dp(n, vector<vector<int>>(max_k + 1, vector<int>(2)));
+        for(int i = 0; i < n; i++){
+            for(int k = max_k; k >= 1; k--){
+                // k--: 剩余可交易次数逐步减少, 代表至今至多被允许进行k次交易
+                // 这个疑问很正确，因为我们后文 动态规划答疑篇 有介绍 dp 数组的遍历顺序是怎么确定的，主要是根据 base case，以 base case 为起点，逐步向结果靠近。
+                // 但为什么我从大到小遍历 k 也可以正确提交呢？因为你注意看，dp[i][k][..] 不会依赖 dp[i][k - 1][..]，而是依赖 dp[i - 1][k - 1][..]，而 dp[i - 1][..][..]，都是已经计算出来的，所以不管你是 k = max_k, k--，还是 k = 1, k++，都是可以得出正确答案的。
+                if(i - 1 == -1){
+                    dp[i][k][0] = 0;
+                    dp[i][k][1] = - prices[i];
+                    continue;
+                }
+                dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][1] + prices[i]);
+                dp[i][k][1] = max(dp[i-1][k-1][0] - prices[i], dp[i-1][k][1]); // k-1->k，代表增加了一次交易，并且是合法的
+            }
+        }
+        return dp[n-1][max_k][0];
+    }
+    
+    /*
      309. 最佳买卖股票时机含冷冻期
      */
     int maxProfit_309_1(vector<int>& prices){
