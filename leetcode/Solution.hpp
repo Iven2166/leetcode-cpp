@@ -2501,6 +2501,257 @@ public:
        }
        return ans;
    }
+    /*
+    704. 二分查找
+    给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
+
+    输入: nums = [-1,0,3,5,9,12], target = 9
+    输出: 4
+    解释: 9 出现在 nums 中并且下标为 4
+     */
+    int search(vector<int>& nums, int target){
+        int left = 0, right = nums.size() - 1;
+        while(left <= right){
+            int mid = (right - left) / 2 + left;
+            if(nums[mid] == target){
+                return mid;
+            }
+            else if(nums[mid] < target){
+                left = mid + 1;
+            }
+            else{
+                right = mid - 1;
+            }
+        }
+        return -1;
+    }
+    
+    int left_bound(vector<int>& nums, int target){
+        int left = 0, right = nums.size();
+        while(left < right){
+            int mid = (right - left) / 2 + left;
+            if(nums[mid] == target){
+                right = mid;
+            }
+            else if(nums[mid] > target){
+                right = mid;
+            }
+            else{
+                left = mid + 1;
+                // 因为我们的「搜索区间」是 [left, right) 左闭右开，所以当 nums[mid] 被检测之后，下一步应该去 mid 的左侧或者右侧区间搜索，即 [left, mid) 或 [mid + 1, right)
+            }
+        }
+        return left;
+    }
+    
+    int right_bound(vector<int>& nums, int target){
+        int left = 0, right = nums.size();
+        while(left < right){
+            int mid = (right - left) / 2 + left;
+            if(nums[mid] == target){
+                // 向右缩小区间
+                left = mid + 1;
+            }
+            else if(nums[mid] < target){
+                left = mid + 1;
+            }
+            else{
+                right = mid; // 右侧是开区间，
+            }
+        }
+        return left - 1;
+    }
+    
+    /*
+     1011. 在 D 天内送达包裹的能力
+     传送带上的包裹必须在 days 天内从一个港口运送到另一个港口。
+     传送带上的第i 个包裹的重量为 weights[i]。
+     每一天，我们都会按给出重量（weights）的顺序往传送带上装载包裹。我们装载的重量不会超过船的最大运载重量。
+     返回能在 days 天内将传送带上的所有包裹送达的船的最低运载能力。
+     示例 1：
+     输入：weights = [1,2,3,4,5,6,7,8,9,10], days = 5
+     输出：15
+     解释：
+     船舶最低载重 15 就能够在 5 天内送达所有包裹，如下所示：
+     第 1 天：1, 2, 3, 4, 5
+     第 2 天：6, 7
+     第 3 天：8
+     第 4 天：9
+     第 5 天：10
+
+     来源：力扣（LeetCode）
+     链接：https://leetcode.cn/problems/capacity-to-ship-packages-within-d-days
+     著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     [1,2,3,4,5,6,7,8,9,10]
+     [1,3,6,10,15,21,28,36,45,55]
+     55/5=11 最小值
+     55较大值
+     (55-11)/2+11=33
+     
+     */
+public:
+    bool ship_days(vector<int>& weights, int x, int target_days){
+        int days = 0;
+        int tmp = 0;
+        for(int i = 0; i < weights.size(); i++){
+            if(weights[i] > x){
+                return false;
+            }
+            tmp += weights[i];
+            if(tmp > x){
+                days += 1;
+                tmp = weights[i];
+            }
+        }
+        cout << "x" << x << "days" << days << endl;
+        return (days + 1 <= target_days) ? true : false;
+    }
+    
+    int shipWithinDays(vector<int>& weights, int days){
+        int sum = 0;
+        for(auto i: weights) sum+=i;
+        int left = sum/days; // 最小可能值
+        int right = sum + 1; // 最大可能值
+        // 寻找最效左边界
+        while(left < right){
+            int mid = (right - left) / 2 + left;
+            if(ship_days(weights, mid, days)){
+                // 说明需要缩小边界
+                right = mid;
+            }
+            else{
+                left = mid + 1;
+            }
+            cout << mid << endl;
+        }
+        return left;
+    }
+    /*
+     121. 买卖股票的最佳时机
+     转移应该是：dp[天数][最大允许交易次数][是否持有 0 or 1]
+     dp[i][1][0] = max(dp[i-1][1][0], dp[i-1][1][1] + prices[i])
+     dp[i][1][1] = max(dp[i-1][1][1], dp[i-1][0][0] - prices[i])
+              = max(dp[i-1][1][1], 0 - prices[i])
+     */
+    int maxProfit_121_1(vector<int>& prices){
+        int n = prices.size();
+        // 定义转移矩阵
+        vector<vector<int>> dp(n, vector<int>(2));
+        for(int i = 0; i < n; i++){
+            if(i - 1 == -1){
+                dp[i][1] = - prices[i];
+                dp[i][0] = 0;
+                continue;
+            }
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = max(dp[i-1][1], -prices[i]);
+        }
+        return dp[n-1][0];
+    }
+    
+    int maxProfit_121_2(vector<int>& prices){
+        int n = prices.size();
+        // 定义转移矩阵
+        int hold = -prices[0], nohold = 0;
+        for(int i = 0; i < n; i++){
+            hold = max(hold, -prices[i]);
+            nohold = max(nohold,  hold + prices[i]);
+        }
+        return nohold;
+    }
+    
+    /*
+     122. 买卖股票的最佳时机 II
+     */
+    int maxProfit_122_1(vector<int>& prices){
+        int n = prices.size();
+        vector<vector<int>> dp(n, vector<int>(2));
+        for(int i = 0; i < n; i++){
+            if(i - 1 == -1){
+                dp[i][0] = 0;
+                dp[i][1] = -prices[i];
+                continue;
+            }
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i]);
+        }
+        return dp[n-1][0];
+    }
+    
+    int maxProfit_122_2(vector<int>& prices){
+        int n = prices.size();
+        // 定义转移矩阵
+        int hold = -prices[0], nohold = 0;
+        for(int i = 0; i < n; i++){
+            hold = max(hold, nohold - prices[i]);
+            nohold = max(nohold,  hold + prices[i]);
+        }
+        return nohold;
+    }
+    
+    /*
+     309. 最佳买卖股票时机含冷冻期
+     */
+    int maxProfit_309_1(vector<int>& prices){
+        int n = prices.size();
+        vector<vector<int>> dp(n, vector<int>(2));
+        for(int i = 0; i < n; i++){
+            // base case 1
+            if(i - 1 == -1){
+                dp[i][0] = 0;
+                dp[i][1] = -prices[i];
+                continue;
+            }
+            // base case 2
+            if(i - 2 == -1){
+                dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+                dp[i][1] = max(dp[i-1][1], 0 - prices[i]);
+                continue;
+            }
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = max(dp[i-1][1], dp[i-2][0] - prices[i]);
+        }
+        return dp[n-1][0];
+    }
+    
+    int maxProfit_309_2(vector<int>& prices){
+        int n = prices.size();
+        // 定义转移矩阵
+        int hold = -prices[0], nohold = 0;
+        int nohold_pre = 0; // 代表dp[i-2][0]
+        for(int i = 0; i < n; i++){
+            int temp = nohold;
+            hold = max(hold, nohold_pre - prices[i]);
+            nohold = max(nohold, hold + prices[i]);
+            nohold_pre = temp;
+        }
+        return nohold;
+    }
+    
+    /*
+     714. 买卖股票的最佳时机含手续费
+     */
+    int maxProfit_714_1(vector<int>& prices, int fee){
+        int n = prices.size();
+        vector<vector<int>> dp(n, vector<int>(2));
+        for(int i = 0; i < n; i++){
+            // base case 1
+            if(i - 1 == -1){
+                dp[i][0] = 0;
+                dp[i][1] = -prices[i] - fee;
+                continue;
+            }
+//            // base case 2
+//            if(i - 2 == -1){
+//                dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+//                dp[i][1] = max(dp[i-1][1], 0 - prices[i]);
+//                continue;
+//            }
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i] - fee);
+        }
+        return dp[n-1][0];
+    }
 };
 
 // 重载运算符号：打印 vector<vector<int>>
