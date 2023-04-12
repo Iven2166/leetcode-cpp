@@ -967,25 +967,37 @@ public:
     
     // 3. 无重复字符的最长子串
     int lengthOfLongestSubstring1(string s) {
-        if(s=="")
-            return 0;
-        // 从左到右遍历。用一个hashmap保存当前字符出现的最新位置 pos（应该是最右边）。查找当下位置i对应字符的pos，如果大于start，说明start应该更新为 pos+1；反之不理。pos所在字符的map-value更新为i
-        unordered_map<char, int> hashmap;
-        int start = 0;
-        hashmap[s[0]] = 0;
-        int len_max = 1;
-        for(int i=1; i<s.size(); i++){
-            auto iter = hashmap.find(s[i]);
-            if((iter!=hashmap.end())){
-                if( (iter->second >= start)){
-                    start = iter->second + 1;
-                }
+//        if(s=="")
+//            return 0;
+//        // 从左到右遍历。用一个hashmap保存当前字符出现的最新位置 pos（应该是最右边）。查找当下位置i对应字符的pos，如果大于start，说明start应该更新为 pos+1；反之不理。pos所在字符的map-value更新为i
+//        unordered_map<char, int> hashmap;
+//        int start = 0;
+//        hashmap[s[0]] = 0;
+//        int len_max = 1;
+//        for(int i=1; i<s.size(); i++){
+//            auto iter = hashmap.find(s[i]);
+//            if((iter!=hashmap.end())){
+//                if( (iter->second >= start)){
+//                    start = iter->second + 1;
+//                }
+//            }
+//            hashmap[s[i]] = i;
+//            if(i-start+1>len_max)
+//                len_max = i - start + 1;
+//        }
+//        return len_max;
+        
+        if(s=="") return 0;
+        int left = 0, res = INT_MIN;
+        unordered_map<char, int> map;
+        for(int right = 0; right < s.size(); right++){
+            if(map.count(s[right]) && map[s[right]] >= left){
+                left = map[s[right]] + 1;
             }
-            hashmap[s[i]] = i;
-            if(i-start+1>len_max)
-                len_max = i - start + 1;
+            map[s[right]] = right;
+            res = max(res, right - left + 1);
         }
-        return len_max;
+        return res;
     }
     
     //3. 无重复字符的最长子串
@@ -2915,6 +2927,8 @@ public:
         a->next = reverseKGroup(b, k);
         return newhead;
     }
+    
+    // 234. 判断回文链表
     bool isPalindrome_234_method1(ListNode* head){
         // 用栈存储值，再用双指针判断
         vector<int> stk;
@@ -2933,7 +2947,7 @@ public:
 private:
     ListNode* isPalindrome_method2_left;
 public:
-    bool isPalindrome_method2(ListNode* head){
+    bool isPalindrome_234_method2(ListNode* head){
         /* 递归解法：反复调用方法并压栈，用left表示当前所在方法的左端
          类似于链表的反序列打印
          void traverse(listnode* head){
@@ -2945,11 +2959,11 @@ public:
          }
          */
         isPalindrome_method2_left = head;
-        return isPalindrome_method2_traverse(head);
+        return isPalindrome_234_method2_traverse(head);
     }
-    bool isPalindrome_method2_traverse(ListNode* right){
+    bool isPalindrome_234_method2_traverse(ListNode* right){
         if(right == nullptr){return true;}
-        bool tmp = isPalindrome_method2_traverse(right->next);
+        bool tmp = isPalindrome_234_method2_traverse(right->next);
         bool res = tmp && (isPalindrome_method2_left->val == right->val);
         isPalindrome_method2_left = isPalindrome_method2_left->next;
         return res;
