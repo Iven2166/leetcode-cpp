@@ -2915,6 +2915,45 @@ public:
         a->next = reverseKGroup(b, k);
         return newhead;
     }
+    bool isPalindrome_234_method1(ListNode* head){
+        // 用栈存储值，再用双指针判断
+        vector<int> stk;
+        ListNode* tmp = head;
+        while(tmp != nullptr){
+            stk.emplace_back(tmp->val);
+            tmp = tmp->next;
+        }
+        for(int i = 0; i < stk.size() / 2; i++){
+            if(stk[i] != stk[stk.size() - 1 - i]){
+                return false;
+            }
+        }
+        return true;
+    }
+private:
+    ListNode* isPalindrome_method2_left;
+public:
+    bool isPalindrome_method2(ListNode* head){
+        /* 递归解法：反复调用方法并压栈，用left表示当前所在方法的左端
+         类似于链表的反序列打印
+         void traverse(listnode* head){
+             if(head == nullptr){return;} // base case: 到了最末端
+             // -->放前面为前序遍历
+             traverse(head->next);
+             // -->放后面为后序遍历
+             cout << head->val; // 后序遍历
+         }
+         */
+        isPalindrome_method2_left = head;
+        return isPalindrome_method2_traverse(head);
+    }
+    bool isPalindrome_method2_traverse(ListNode* right){
+        if(right == nullptr){return true;}
+        bool tmp = isPalindrome_method2_traverse(right->next);
+        bool res = tmp && (isPalindrome_method2_left->val == right->val);
+        isPalindrome_method2_left = isPalindrome_method2_left->next;
+        return res;
+    }
 };
 
 // 重载运算符号：打印 vector<vector<int>>
