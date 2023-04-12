@@ -1900,7 +1900,8 @@ public:
         while(l >= 0 && r <= s.size() - 1 && s[l]==s[r]){
             l--; r++;
         }
-        return s.substr(l + 1, r - l - 1);  // 比如 l=0,r=0,则l=-1,r=1,应该是 l+1=0,r-l-1=1
+        // 因为在最后一次不符合while内条件时，l比正确位置多-1，r多+1
+        return s.substr(l + 1, r - l - 1);
     }
     
 public:
@@ -2776,6 +2777,143 @@ public:
             dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i] - fee);
         }
         return dp[n-1][0];
+    }
+    
+    
+    /*
+     198. 打家劫舍
+     */
+    int rob198_1(vector<int>& nums){
+        // dp[i] = max(dp[i-1], dp[i-2] + nums[i])
+        // base case: dp[0] = nums[0], dp[1] = max(dp[0],nums[1])
+        int n = nums.size();
+        vector<int> dp(n, 0);
+        for(int i = 0; i < n; i++){
+            if(i == 0){
+                dp[i] = nums[i];
+            }
+            else if(i == 1){
+                dp[i] = max(dp[i-1], nums[i]);
+            }
+            else{
+                dp[i] = max(dp[i-1], dp[i-2] + nums[i]);
+            }
+        }
+        return dp[n-1];
+    }
+    
+    int rob_198_2(vector<int>& nums){
+        int n = nums.size();
+        if(n<=2){
+            return *max_element(nums.begin(), nums.end());
+        }
+        int first = nums[0], second = max(nums[0], nums[1]);
+        for(int i = 2; i < n; i++){
+            int temp = second;
+            second = max(first + nums[i], second);
+            first = temp;
+        }
+        return second;
+    }
+    
+public:
+    // 213. 打家劫舍 II
+    int rob_213(vector<int>& nums) {
+        int n = nums.size();
+        if(n<=2){
+            return *max_element(nums.begin(), nums.end());
+        }
+        int res1 = rob_213_help1(nums, 0, n - 1);
+        int res2 = rob_213_help1(nums, 1, n);
+        return max(res1, res2);
+    }
+private:
+    int rob_213_help1(vector<int>& nums, int start, int end){
+        // 左闭右开
+        int first = nums[start], second = max(nums[start], nums[start+1]);
+        for(int i = start + 2; i < end; i++){
+            int temp = second;
+            second = max(second, first + nums[i]);
+            first = temp;
+        }
+        return second;
+    }
+    /*
+     337. 打家劫舍 III
+     */
+private:
+    pair<int, int> rob_337_dfs(TreeNode* cur){
+        if(cur == nullptr){
+            return {0,0};
+        }
+        // pair: 0-选择节点，1-不选择该节点
+        pair<int, int> left_pair = rob_337_dfs(cur->left);
+        pair<int, int> right_pair = rob_337_dfs(cur->right);
+        return {
+            cur->val + left_pair.second + right_pair.second,
+            max(left_pair.first, left_pair.second) + max(right_pair.first, right_pair.second)
+        };
+    }
+public:
+    int rob_337(TreeNode* root){
+        pair<int,int> res = rob_337_dfs(root);
+        return max(res.first, res.second);
+    }
+    
+    // 206. 反转链表
+    ListNode* reverseList(ListNode* head) {
+        if(head == nullptr || head->next == nullptr){
+            return head;
+        }
+        ListNode* last = reverseList(head->next);
+        head->next->next = head;
+        head->next = nullptr;
+        return last;
+    }
+    
+    // 变体：将链表的前 n 个节点反转（n <= 链表长度）
+private:
+    ListNode* sucessor = nullptr;
+public:
+    ListNode* reverseListN(ListNode* head, int n){
+        if(n == 1){
+            sucessor = head->next;
+            return head;
+        }
+        ListNode* last = reverseListN(head->next, n-1);
+        head->next->next = head;
+        head->next = sucessor;
+        return last;
+    }
+    
+    // 25.k个一组反转链表
+    ListNode* reverseKGroupHelper(ListNode* a, ListNode* b){
+        // 反转 [a,b) 左闭右开的区间
+        ListNode *pre, *cur, *nxt;
+        pre = nullptr; cur = a; nxt = a;
+        while(cur != b){
+            nxt = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = nxt;
+        }
+        return pre;
+    }
+    ListNode* reverseKGroup(ListNode* head, int k){
+        if(head == nullptr) return head;
+        // 区间 [a,b) 包含待反转元素
+        ListNode *a, *b;
+        a = head;
+        b = head;
+        // 获取b位置
+        for(int i = 0; i < k; i++){
+            if(b == nullptr) return head;
+            b = b->next;
+        }
+        // 反转前 k 个元素
+        ListNode* newhead = reverseKGroupHelper(a, b);
+        a->next = reverseKGroup(b, k);
+        return newhead;
     }
 };
 
