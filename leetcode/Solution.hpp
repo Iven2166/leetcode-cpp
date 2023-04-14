@@ -934,6 +934,105 @@ public:
         return ans;
     }
     
+    // 我觉得这一版写的更清晰，先定义起点，然后做二分查找
+    vector<vector<int>> threeSumBetter(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> res;
+        for(int start=0; start<nums.size()-2; start++){
+            if((nums[start] > 0) || (nums[start]+nums[start+1]+nums[start+2] > 0)){ // 剪枝: 60%->85%
+                return res;
+            }
+            if(start>=1 && nums[start]==nums[start-1]){
+                continue;
+            }
+            int target = - nums[start];
+            int left = start + 1;
+            int right = nums.size() - 1;
+            while(left < right){
+                if(nums[left] + nums[right] == target){
+                    res.push_back({nums[start],nums[left],nums[right]});
+                    // 可能还会有其他的组合
+                    while(left<right && nums[left]==nums[left+1]){
+                        left++; // 如果遇到相同的数字，就继续往前
+                    }
+                    while(left<right && nums[right]==nums[right-1]){
+                        right--; // 如果遇到相同的数字，就继续往前
+                    }
+                    left++;
+                    right--;
+                }
+                else if(nums[left] + nums[right] > target){
+                    right--;
+                }
+                else{
+                    left++;
+                }
+            }
+        }
+        return res;
+    }
+    
+    //259. 较小的三数之和
+    // 双指针
+    int threeSumSmaller_method1(vector<int>& nums, int target) {
+        if(nums.size()==0){return 0;}
+        if(nums.size()<3){return 0;}
+        sort(nums.begin(), nums.end());
+        int ans = 0;
+        for(int i=0; i<nums.size()-2; i++){
+            int left = i+1;
+            int right=nums.size()-1;
+            // cout << i<< ','<< left << ',' << right<<endl;
+            while(left < right){
+                if(nums[i] + nums[left] + nums[right] < target){
+                    ans+=(right-left);
+                    left++;
+                }
+                else{
+                    right--;
+                }
+            }
+        }
+        return ans;
+    }
+public:
+    // 方法2: 二分查找
+    int threeSumSmaller_method2(vector<int>& nums, int target) {
+        if(nums.size()<3){return 0;}
+        sort(nums.begin(), nums.end());
+        int res = 0;
+        for(int i=0; i<nums.size()-2; i++){
+            res += twoSumSmaller(nums, i+1, target-nums[i]);
+        }
+        return res;
+    }
+private:
+    int twoSumSmaller(vector<int>& nums, int startIdx, int target){
+        int res = 0;
+        for(int i=startIdx; i<nums.size()-1; i++){
+            int pos = binarySearch(nums, i, target-nums[i]);
+            res += (pos - i);
+        }
+        return res;
+    }
+    int binarySearch(vector<int>& nums, int startIdx, int target){
+        // 寻找 nums[startIdx:] 之间小于target的最大数
+        int left = startIdx;
+        int right = nums.size() - 1;
+        while(left < right){
+            int mid = (right + left + 1) / 2; // 注意需要加1，因为是左右闭区间
+            if(nums[mid] >= target){
+                right = mid - 1; // mid 不可能，所以更换为 mid-1
+            }
+            else if(nums[mid] < target){
+                left = mid; // 别超过小于target的最大数
+            }
+        }
+        return left;
+    }
+    
+    
+public:
     //20. 有效的括号
     bool isValid(string s) {
         unordered_map <char, char> hashmap = {{')','('},{'}','{'},{']','['}};
@@ -2966,6 +3065,78 @@ public:
         bool tmp = isPalindrome_234_method2_traverse(right->next);
         bool res = tmp && (isPalindrome_method2_left->val == right->val);
         isPalindrome_method2_left = isPalindrome_method2_left->next;
+        return res;
+    }
+    
+    // 10. 正则表达式匹配
+    /*
+     s = ' ' + s
+     p = ' ' + p
+     p[j] != '*'
+         if s[i]=p[j] , then dp[i][j] = dp[i-1][j-1] 直接匹配
+         if s[i]!=p[j] , then dp[i][j] = false
+     p[j] == '*'
+         if s[i]=p[j-1], 说明p的j-1个字符，能够用于继续匹配，所以 dp[i][j] = dp[i-1][j] OR dp[i][j-2] 或者完全不匹配
+         if s[i]!=p[j-1] 的情况，dp[i][j] = dp[i][j-2] 完全不匹配
+     */
+    bool isMatch_matches(string s, string p, int p1, int p2){
+        if(p1 == 0)
+            return false; // 什么都不匹配
+        if(s[p1]==p[p2] or p[p2]=='.')
+            return true;
+        return false;
+    }
+    bool isMatch(string s, string p){
+        // s = string, p = pattern
+        s = ' ' + s;
+        p = ' ' + p;
+        vector<vector<bool>> dp(s.size(), vector<bool>(p.size(), false));
+        dp[0][0] = true;
+        
+        for(int i=0; i<s.size(); i++){
+            for(int j=0; j<p.size(); j++){
+                if(i == 0 && j == 0){
+                    continue;
+                }
+                else if(i > 0 && j == 0){
+                    dp[i][j] = false;
+                }
+                else{
+                    if(p[j] == '*'){
+                        // 不匹配
+                        dp[i][j] = dp[i][j-2] | dp[i][j];
+                        if(isMatch_matches(s,p,i,j-1)){
+                            // 匹配了p里面 * 前面那个字符
+                            dp[i][j] = dp[i][j] | dp[i-1][j];
+                        }
+                    }
+                    else{
+                        // 没有*，需要直接匹配
+                        if(isMatch_matches(s,p,i,j)){
+                            dp[i][j] = dp[i-1][j-1] | dp[i][j];
+                        }
+                    }
+                }
+            }
+        }
+        return dp[s.size()-1][p.size()-1];
+    }
+    
+    // 11. 盛最多水的容器
+    int maxArea11(vector<int>& height){
+        int left = 0, right = height.size() - 1;
+        int res = INT_MIN;
+        while(left <= right){
+            int h = min(height[left], height[right]);
+            int new_area = h*(right-left);
+            res = (res > new_area)? res:new_area;
+            if(height[left]<=height[right]){
+                left++;
+            }
+            else{
+                right--;
+            }
+        }
         return res;
     }
 };
