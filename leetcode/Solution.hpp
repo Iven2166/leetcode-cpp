@@ -206,6 +206,29 @@ public:
      */
     int longestValidParentheses(string s) {
         int n = s.size();
+        int res = 0;
+        vector<int> dp(n, 0);
+        for(int i=1; i<n; i++){
+            if(s[i] == ')'){
+                if(s[i-1] == '('){
+                    dp[i] = (i-2>=0) ? dp[i-2] + 2 : 2;
+                }
+                else{
+                    if(i - dp[i-1] - 1 >= 0 && s[i - dp[i-1] - 1] == '('){
+                        dp[i] = dp[i-1] + 2;
+                        if(i - dp[i-1] - 2 >= 0){
+                            dp[i] += dp[i - dp[i-1] - 2];
+                        }
+                    }
+                }
+            }
+            res = max(res, dp[i]);
+        }
+        return res;
+    }
+    
+    int longestValidParentheses(string s) {
+        int n = s.size();
         int ans = 0;
         vector<vector<bool>> dp;
         dp.resize(n);
@@ -671,6 +694,36 @@ public:
         return ans;
     }
     
+    /* 152. 乘积最大子数组
+     给你一个整数数组 nums ，请你找出数组中乘积最大的非空连续子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。     测试用例的答案是一个 32-位 整数。
+     子数组 是数组的连续子序列。
+
+     输入: nums = [2,3,-2,4]
+     输出: 6
+     解释: 子数组 [2,3] 有最大乘积 6。
+     链接：https://leetcode.cn/problems/maximum-product-subarray
+     
+     维护一个最大最小的结果？
+    */
+    int maxProduct(vector<int>& nums) {
+        int res = INT_MIN;
+        int n = nums.size();
+        if(n==1)
+            return nums[0];
+        int dp1 = nums[0];
+        int dp2 = nums[0];
+        res = max(dp1, dp2);
+        for(int i=1; i<n; i++){
+            int tmp = dp1;
+            dp1 = min(dp1 * nums[i], dp2 * nums[i]);
+            dp1 = min(dp1, nums[i]);
+            dp2 = max(tmp * nums[i], dp2 * nums[i]);
+            dp2 = max(dp2, nums[i]);
+            res = max(max(res, dp2), dp1);
+        }
+        return res;
+    }
+    
     
     // 21. 合并两个有序链表
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
@@ -703,6 +756,71 @@ public:
         }
         return dummy->next;
     }
+    
+    // 148. 排序链表
+    // 堆排序 + 重建
+    ListNode* sortList_method1(ListNode* head){
+        priority_queue<int, vector<int>, greater<int>> q;
+        ListNode* tmp = head;
+        while(tmp){
+            q.push(tmp->val);
+            tmp = tmp->next;
+        }
+        ListNode* dummy = new ListNode(0);
+        tmp = dummy;
+        while(!q.empty()){
+            int v = q.top();
+            q.pop();
+            tmp->next = new ListNode(v);
+            tmp = tmp->next;
+        }
+        return dummy->next;
+    }
+    // 归并排序
+    ListNode* sortList_method2(ListNode* head){
+        // 归并排序：1、双指针，确定中心位置 2、针对前后分别调用 sortList 3、合并两个结果
+        // base case 开始
+        if(head == nullptr || head->next == nullptr)
+            return head;
+        // base case 结束
+        
+        // 快慢指针
+        ListNode* p1 = head;
+        ListNode* p2 = head->next;
+        
+        while(p1 && p2 && p2->next){
+            p1 = p1->next;
+            p2 = p2->next->next;
+        }
+        ListNode* half2 = p1->next;
+        p1->next = nullptr;
+        ListNode* half1 = head;
+        
+        // 分别排序
+        half1 = sortList_method2(half1);
+        half2 = sortList_method2(half2);
+        
+        // 合并
+        ListNode* dummy = new ListNode(0);
+        ListNode* cur = dummy;
+        int nxt = 0;
+        while(half1 && half2){
+            if(half1->val < half2->val){
+                nxt = half1->val;
+                half1 = half1->next;
+            }
+            else{
+                nxt = half2->val;
+                half2 = half2->next;
+            }
+            cur->next = new ListNode(nxt);
+            cur = cur->next;
+        }
+        if(half1 || half2)
+            cur->next = half1 ? half1 : half2;
+        return dummy->next;
+    }
+    
     
     // 72. 编辑距离
     int minDistance(string word1, string word2) {
@@ -1031,15 +1149,46 @@ private:
         return left;
     }
     
+    //17. 电话号码的字母组合
+private:
+    unordered_map<char, string> letterCombinations_map;
+    string letterCombinations_tmp;
+public:
+    vector<string> letterCombinations(string digits){
+        /*
+         是一颗多叉树，到无子节点的节点时，将经过路径的所有节点，结合为字符串
+         */
+        if(digits=="")
+            return {};
+        letterCombinations_map['2'] = "abc";
+        letterCombinations_map['3'] = "def";
+        letterCombinations_map['4'] = "ghi";
+        letterCombinations_map['5'] = "jkl";
+        letterCombinations_map['6'] = "mno";
+        letterCombinations_map['7'] = "pqrs";
+        letterCombinations_map['8'] = "tuv";
+        letterCombinations_map['9'] = "wxyz";
+        vector<string> res;
+        letterCombinationsHelper(digits, res, 0);
+        return res;
+    }
     
+    void letterCombinationsHelper(string digits,
+                                  vector<string>& res,
+                                  int pos){
+        if(pos == digits.size()){
+            res.emplace_back(letterCombinations_tmp);
+            return;
+        }
+        char cur = digits[pos];
+        for(int i=0; i<letterCombinations_map[cur].size(); i++){
+            letterCombinations_tmp.push_back(letterCombinations_map[cur][i]);
+            letterCombinationsHelper(digits, res, pos+1);
+            letterCombinations_tmp.pop_back();
+        }
+    }
     
 public:
-    //17. 电话号码的字母组合
-    
-    
-    
-    
-    
     //20. 有效的括号
     bool isValid(string s) {
         unordered_map <char, char> hashmap = {{')','('},{'}','{'},{']','['}};
