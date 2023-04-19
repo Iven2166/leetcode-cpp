@@ -19,6 +19,15 @@
 #include <queue>
 using namespace std;
 
+
+class my_comp_listnode{
+public:
+    bool operator() (const ListNode* p1, const ListNode* p2){
+        return p1->val > p2->val;
+    }
+};
+
+
 struct ListNode{
     int val;
     ListNode* next;
@@ -204,7 +213,7 @@ public:
     /*
      给一个一堆括号的字符串，然后返回最长的合法的括号的长度。
      */
-    int longestValidParentheses(string s) {
+    int longestValidParentheses_1(string s) {
         int n = s.size();
         int res = 0;
         vector<int> dp(n, 0);
@@ -227,7 +236,28 @@ public:
         return res;
     }
     
-    int longestValidParentheses(string s) {
+    // 978. 最长湍流子数组
+    int maxTurbulenceSize(vector<int>& arr) {
+        int n = arr.size();
+        vector<vector<int>> dp(n, vector<int>(2,1));
+        dp[0][0] = 1; dp[0][1] = 1;
+        for(int i = 1; i < n; i++){
+            if(arr[i] > arr[i-1]){
+                dp[i][0] = dp[i-1][1] + 1;
+            }
+            else if(arr[i] < arr[i-1]) {
+                dp[i][1] = dp[i-1][0] + 1;
+            }
+        }
+        int res = 1;
+        for(int i=0; i<n; i++){
+            res = max(res, dp[i][0]);
+            res = max(res, dp[i][1]);
+        }
+        return res;
+    }
+    
+    int longestValidParentheses_2(string s) {
         int n = s.size();
         int ans = 0;
         vector<vector<bool>> dp;
@@ -1803,52 +1833,70 @@ public:
     
     
     ListNode* mergeKLists(vector<ListNode*>& lists) {
-        priority_queue<ListNode*, vector<ListNode*>, myPriorityQueueCompareOnListnodes> my_pq;
-        for(auto& item: lists){
-            if(item!=nullptr)my_pq.push(item);
+        if(lists.size() == 0){return nullptr;}
+        priority_queue<ListNode*, vector<ListNode*>, my_comp_listnode> q;
+        for(auto value: lists){
+            if(value!=nullptr)
+                q.push(value);
         }
-        ListNode* dummy = new ListNode(0);
-        ListNode* p = dummy;
-        while(!my_pq.empty()){
-            ListNode* tmp = my_pq.top();
-            p->next = new ListNode(tmp->val);
-            p = p->next;
-            my_pq.pop();
-            if(tmp->next!=nullptr){my_pq.push(tmp->next);}
+        ListNode* res = new ListNode(0);
+        ListNode* dummy = res;
+        while(!q.empty()){
+            ListNode* tmp = q.top();
+            q.pop();
+            dummy->next = new ListNode(tmp->val);
+            dummy = dummy->next;
+            tmp = tmp->next;
+            if(tmp!=nullptr){q.push(tmp);}
         }
-        return dummy->next;
+        return res->next;
     }
     
     // 方法2:分治算法
-    ListNode* timu23_mergeTwoLists(ListNode* list1, ListNode* list2){
-        // 如果其中一个为空，判断去返回
-        if((!list1)||(!list2)){return list1? list1: list2;}
-        // 两个均不为空
-        ListNode* dummy = new ListNode;
-        ListNode* p = dummy;
-        ListNode* p1 = list1;
-        ListNode* p2 = list2;
+    ListNode* mergeKLists_fenzhi(vector<ListNode*>& lists) {
+        /*
+        分治算法：这个vector有n长度，采用二分法逐步找到最底层，再合并。
+        最底层是实现两个 排序listnode 合并的算法
+        */
+        ListNode* res = mergeKListsBetween(lists, 0, lists.size() - 1);
+        return res;
+    }
+    
+    ListNode* mergeKListsBetween(vector<ListNode*>& lists, int l, int r){
+        // base case
+        if(l == r){
+            return lists[l];
+        }
+        if(l > r){
+            return nullptr;
+        }
+        // base case end
+        int mid = (r + l) / 2;
+        return mergeTwoListNode(mergeKListsBetween(lists, l, mid),
+                                mergeKListsBetween(lists, mid + 1, r));
+    }
+    
+    ListNode* mergeTwoListNode(ListNode* l1, ListNode* l2){
+        if(l1 == nullptr || l2 == nullptr){
+            return (l1 != nullptr) ? l1 : l2;
+        }
+        // both two listnodes are not nullptr
+        ListNode *p1 = l1, *p2 = l2;
+        ListNode* res = new ListNode(0);
+        ListNode* dummy = res;
         while(p1 && p2){
             if(p1->val < p2->val){
-                p->next = new ListNode(p1->val);
-                p1 = p1->next;}
-            else{p->next = new ListNode(p2->val);
-                p2 = p2->next;}
-            p = p->next;
+                dummy->next = new ListNode(p1->val);
+                p1 = p1->next;
+            }
+            else{
+                dummy->next = new ListNode(p2->val);
+                p2 = p2->next;
+            }
+            dummy = dummy->next;
         }
-        p->next = p1 ? p1: p2;
-        return dummy->next;
-    }
-    ListNode* timu23_merge(vector<ListNode*>& lists, int l, int r){
-        if(l==r){return lists[l];}
-        else if(l>r){return nullptr;}
-        else{
-            int mid = (l + r) / 2;
-            return timu23_mergeTwoLists(timu23_merge(lists, l, mid), timu23_merge(lists, mid+1, r));
-        }
-    }
-    ListNode* timu23_mergeKListsMethod2(vector<ListNode*>& lists){
-        return timu23_merge(lists, 0, lists.size() - 1);
+        dummy->next = (p1!=nullptr) ? p1 : p2;
+        return res->next;
     }
     
     // 19. 删除链表的倒数第 N 个结点

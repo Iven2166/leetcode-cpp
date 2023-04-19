@@ -33,8 +33,8 @@ int main(){
     cout << "----- no.3 -----";
     cout << endl;
     string s3 = "abcabcbb";
-    int res3 = solution.lengthOfLongestSubstring(s3);
-    cout << res3 << endl;
+//    int res3 = solution.lengthOfLongestSubstring(s3);
+//    cout << res3 << endl;
     
     cout << "----- no.2 -----";
     cout << endl;
