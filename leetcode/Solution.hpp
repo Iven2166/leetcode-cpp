@@ -247,7 +247,7 @@ public:
      --
      应该是二分法，不同的是，分段升序
      */
-    int search(vector<int>& nums, int target) {
+    int search33(vector<int>& nums, int target) {
         int n = nums.size();
         if(!n){
             return -1;
@@ -258,8 +258,46 @@ public:
             if(target == nums[mid]){
                 return mid;
             }
-            if(nums[mid] >= nums[0]){ // 注意这里不是 left， 而是 0
-                if(target >= nums[0] && target < nums[mid]){
+            if(nums[mid] >= nums[left]){
+                if(target >= nums[left] && target < nums[mid]){
+                    right = mid - 1;
+                }
+                else{
+                    left = mid + 1;
+                }
+            }
+            else {
+                if(target > nums[mid] && target <= nums[right]){
+                    left = mid + 1;
+                }
+                else{
+                    right = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
+    
+    
+    // 81. 搜索旋转排序数组 II
+    
+    bool search(vector<int>& nums, int target) {
+        int n = nums.size();
+        if(!n){
+            return -1;
+        }
+        int left = 0, right = n - 1;
+        while(left <= right){
+            int mid = (right + left) / 2;
+            if(target == nums[mid]){
+                return true;
+            }
+            if(nums[left] == nums[mid] && nums[right]==nums[mid]){
+                left++;
+                right--;
+            }
+            else if(nums[mid] >= nums[left]){
+                if(target >= nums[left] && target < nums[mid]){
                     right = mid - 1;
                 }
                 else{
@@ -275,7 +313,26 @@ public:
                 }
             }
         }
-        return -1;
+        return false;
+    }
+
+    // 153. 寻找旋转排序数组中的最小值
+    int findMin(vector<int>& nums) {
+        int n = nums.size();
+        if(n==1){
+            return nums[0];
+        }
+        int left = 0, right = n-1;
+        while(left < right){
+            int mid = (right + left) / 2;
+            if(nums[mid] < nums[right]){
+                right = mid;
+            }
+            else{
+                left = mid + 1;
+            }
+        }
+        return nums[left];
     }
     
     // 978. 最长湍流子数组
@@ -2569,6 +2626,7 @@ public:
                 continue;
             }
             else{
+                // 如何在这里体现不选择 i 位置的数字？ -- 因为可以先选其它位置的，如果走到 sum == target，说明不需要该i位置的数字
                 combinationSum2tmp.emplace_back(candidates[i]);
                 combinationSum2CurrentSum += candidates[i];
                 combinationSum2Backtrack(i+1, candidates, target);
@@ -2579,6 +2637,34 @@ public:
     }
     
     
+    // 77. 组合
+private:
+    vector<vector<int>> combineres;
+    vector<int> combinetmp;
+    
+public:
+    vector<vector<int>> combine(int n, int k) {
+        combinecore(0, k, n);
+        return combineres;
+    }
+    void combinecore(int curr, int k, int n){
+        if(combinetmp.size() == k){
+            combineres.push_back(combinetmp);
+            return;
+        }
+        if(curr >= n){
+            return;
+        }
+        for(int i = curr; i < n; i++){
+            combinetmp.push_back(i+1);
+            combinecore(i+1, k, n);
+            combinetmp.pop_back();
+        }
+        // tmp.push_back(curr);
+        // core(curr+1, k, n);
+        // tmp.pop_back();
+        // core(curr+1, k, n);
+    }
     
     /*
      216. 组合总和 III
@@ -2603,22 +2689,22 @@ private:
     
 public:
     vector<vector<int>> combinationSum3(int k, int n) {
-        combinationSum3core(1, n, k);
+        combinationSum3core(0, n, k);
         return combinationSum3res;
     }
-    void combinationSum3core(int num, int remain, int k){
+    void combinationSum3core(int idx, int remain, int k){
         // num: the current num between 1 and 9
         if(remain == 0 && combinationSum3tmp.size() == k){
             combinationSum3res.push_back(combinationSum3tmp);
             return;
         }
-        if(remain < 0 || combinationSum3tmp.size() > k || num > 9){return;}
-        combinationSum3core(num+1, remain, k);
-//        for(int i = num + 1; i < 10; i++){
-        combinationSum3tmp.push_back(num);
-        combinationSum3core(num+1, remain-num, k);
-        combinationSum3tmp.pop_back();
-//        }
+        if(remain < 0 || combinationSum3tmp.size() > k || idx >= 9){return;}
+        // core(num+1, remain, k);
+       for(int i = idx; i < 9; i++){
+            combinationSum3tmp.push_back(i+1);
+            combinationSum3core(i+1, remain-i-1, k);
+            combinationSum3tmp.pop_back();
+       }
     }
     
     
@@ -3319,6 +3405,46 @@ public:
         ListNode* newhead = reverseKGroupHelper(a, b);
         a->next = reverseKGroup(b, k);
         return newhead;
+    }
+    
+    // 34. 在排序数组中查找元素的第一个和最后一个位置
+    bool binarySearch34(vector<int>& nums, bool lower, int target){
+        int left = 0, right=nums.size()-1, ans=nums.size();
+        while(left <= right){
+            int mid = (right + left) >> 1;
+            if(nums[mid] > target || (nums[mid] >= target && lower)){
+                right = mid - 1;
+                ans = mid;
+            }
+            else{
+                left = mid + 1;
+            }
+        }
+        return ans;
+    }
+    vector<int> searchRange(vector<int>& nums, int target) {
+        int left_idx = binarySearch34(nums, true, target);
+        int right_idx = binarySearch34(nums, false, target) - 1;
+        if(left_idx <= right_idx && right_idx < nums.size() && nums[left_idx]==target && nums[right_idx]==target){
+            return {left_idx, right_idx};
+        }
+        return {-1,-1};
+    }
+    
+    //278. 第一个错误的版本
+    int firstBadVersion(int n) {
+        int left = 0, right = n-1, ans=n;
+        while(left <= right){
+            int mid = (right - left + 1) / 2 + left;
+            if(isBadVersion(mid)){
+                right = mid - 1;
+                ans = mid;
+            }
+            else{
+                left = mid + 1;
+            }
+        }
+        return ans;
     }
     
     // 234. 判断回文链表
