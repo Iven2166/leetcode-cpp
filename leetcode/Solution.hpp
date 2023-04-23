@@ -236,6 +236,48 @@ public:
         return res;
     }
     
+public:
+    // 33. 搜索旋转排序数组
+    /*
+     整数数组 nums 按升序排列，数组中的值 互不相同 。
+
+     在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
+     给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
+     你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
+     --
+     应该是二分法，不同的是，分段升序
+     */
+    int search(vector<int>& nums, int target) {
+        int n = nums.size();
+        if(!n){
+            return -1;
+        }
+        int left = 0, right = n - 1;
+        while(left <= right){
+            int mid = (right + left) / 2;
+            if(target == nums[mid]){
+                return mid;
+            }
+            if(nums[mid] >= nums[0]){ // 注意这里不是 left， 而是 0
+                if(target >= nums[0] && target < nums[mid]){
+                    right = mid - 1;
+                }
+                else{
+                    left = mid + 1;
+                }
+            }
+            else { // 注意这里不是 right 而是 n-1
+                if(target > nums[mid] && target <= nums[n-1]){
+                    left = mid + 1;
+                }
+                else{
+                    right = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
+    
     // 978. 最长湍流子数组
     int maxTurbulenceSize(vector<int>& arr) {
         int n = arr.size();
@@ -1511,23 +1553,35 @@ public:
     }
     // 31. 下一个排列
     void nextPermutation(vector<int> &nums){
+        /*
+         我们希望找到一种方法，能够找到一个大于当前序列的新序列，且变大的幅度尽可能小。具体地：我们需要将一个左边的「较小数」与一个右边的「较大数」交换，以能够让当前排列变大，从而得到下一个排列。同时我们要让这个「较小数」尽量靠右，而「较大数」尽可能小。当交换完成后，「较大数」右边的数需要按照升序重新排列。这样可以在保证新排列大于原来排列的情况下，使变大的幅度尽可能小。
+         链接：https://leetcode.cn/problems/next-permutation/solution/xia-yi-ge-pai-lie-by-leetcode-solution/
+         以 [4,5,2,6,3,1] 为例：
+         1、从右到左，找到第一个顺序对 [2,6]，定义 2 位置为 i，则 [i+1,n)为降序排列
+         2、从右到左，找到第一个大于 nums[i] = 2的数，即 3，位置j
+         3、交换 i j 位置，成为  [4,5,3,6,2,1]
+         4、此刻 [i+1, n) 为降序，用双指针改为 升序，完成 [4,5,3,1,2,6]
+         */
         int n = nums.size();
         int i = n - 2;
         while(i >= 0 && nums[i] >= nums[i+1])
             i --;
+        // 此时 i 右侧为降序
+        
+        // 从右侧寻找一个刚好大于 nums[i] 的位置
         if(i >= 0){
             int j = n - 1;
-            while(j >= i + 1 && nums[j] < nums[i])
+            while(j >= i + 1 && nums[j] <= nums[i])
                 j--;
             swap(nums[i], nums[j]);
         }
+        // sort(nums.begin() + i + 1,nums.end());
         int left = i + 1, right = n - 1;
         while(left <= right){
             swap(nums[left], nums[right]);
             left++;
             right--;
         }
-        //        sort(nums.begin() + i + 1,nums.end());
     }
     // 394. 字符串解码
     string decodeString(string s){
@@ -2685,6 +2739,42 @@ public:
         }
         
     }
+    
+    string getPermutation(int n, int k) {
+        string res = "";
+        for(int i=0; i<n; i++){
+            char v = '0' + i + 1;
+            res.push_back(v);
+        }
+        // cout << res << endl;
+        k--;
+        while(k){
+            res = nextPermutation(res);
+            k--;
+        }
+        return res;
+    }
+
+//    string nextPermutation(string nums) {
+//        int n = nums.size();
+//        int i = n - 2;
+//        while(i >= 0 && nums[i] >= nums[i+1])
+//            i --;
+//        if(i >= 0){
+//            int j = n - 1;
+//            while(j >= i + 1 && nums[j] <= nums[i])
+//                j--;
+//            swap(nums[i], nums[j]);
+//        }
+//        // sort(nums.begin() + i + 1,nums.end());
+//        int left = i + 1, right = n - 1;
+//        while(left <= right){
+//            swap(nums[left], nums[right]);
+//            left++;
+//            right--;
+//        }
+//        return nums;
+//    }
     
     /*
      90. 子集 II
