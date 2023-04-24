@@ -2707,6 +2707,40 @@ public:
        }
     }
     
+    // 377. 组合总和 Ⅳ
+    
+    int combinationSum4(vector<int>& nums, int target) {
+        vector<int> dp(target + 1, 0);
+        dp[0] = 1; // 什么都不选
+        for(int t=1; t<=target; t++){
+            for(int v: nums){
+                if(v <= t &&  dp[t - v] < INT_MAX - dp[t]){
+                    dp[t] += dp[t-v];
+                }
+            }
+        }
+        return dp[target];
+    }
+    
+    // 254. 因子的组合
+    vector<vector<int>> getFactors(int n) {
+        vector<vector<int>> res = helper(n, 2);
+        return res;
+    }
+    vector<vector<int>> helper(int n, int div){
+        vector<vector<int>> res;
+        for(int i = div; i < sqrt(n+1) ; i++){
+            if(n % i == 0){
+                res.push_back({i, n/i});
+                for(auto tmp: helper(n/i, i)){
+                    tmp.push_back(i);
+                    res.push_back(tmp);
+                    tmp.pop_back();
+                }
+            }
+        }
+        return res;
+    }
     
     // 78. 子集
 private:
@@ -3559,6 +3593,55 @@ public:
         }
         return res;
     }
+    
+    // 238. 除自身以外数组的乘积
+    
+    vector<int> productExceptSelf(vector<int>& nums) {
+        // 优化版
+        int left = 1, right = 1, n = nums.size();
+        vector<int> res(n, 1);
+        for(int i=0; i<n; i++){
+            // 在当下时点，left是为了i，right为了n-1-i
+            res[i] *= left;
+            res[n-1-i] *= right;
+            left *= nums[i];
+            right *= nums[n-1-i];
+        }
+        return res;
+
+        // 数组版
+        // vector<int> l1, l2, res;
+        // l1.push_back(1);
+        // l2.push_back(1);
+        // int n = nums.size();
+        // for(int i=0; i<n; i++){
+        //     l1.push_back(l1[l1.size()-1] * nums[i]);
+        //     l2.push_back(l2[l2.size()-1] * nums[n-1-i]);
+        // }
+        // for(int i=0; i<n; i++){
+        //     res.push_back(l1[i] * l2[n-1-i]);
+        // }
+        // return res;
+    }
+    // 48. 旋转图像
+    void rotate(vector<vector<int>>& matrix) {
+        int h = matrix.size(), w = matrix[0].size();
+        for(int i=0; i<h; i++){
+            for(int j=i; j<w; j++){
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = tmp;
+            }
+        }
+        for(int i=0; i<h; i++){
+            for(int j=0; j<w/2; j++){
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[i][w-1-j];
+                matrix[i][w-1-j] = tmp;
+            }
+        }
+    }
+    
 };
 
 // 重载运算符号：打印 vector<vector<int>>
