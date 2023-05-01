@@ -808,19 +808,13 @@ public:
     
     //53. 最大子数组和
     int maxSubArray(vector<int>& nums) {
-        if(nums.size()==1)
-            return nums[0];
-        int dp = nums[0], ans = nums[0];
-        for(int i=1; i<nums.size(); i++){
-            if(dp<0){
-                dp = nums[i];
-            }
-            else{
-                dp += nums[i];
-            }
-            ans = (ans < dp) ? dp : ans;
+        int dp_last = INT_MIN, dp = 0;
+        int res = INT_MIN;
+        for(auto v: nums){
+            dp = max(dp + v, v);
+            res = max(res, dp);
         }
-        return ans;
+        return res;
     }
     
     /* 152. 乘积最大子数组
@@ -851,6 +845,72 @@ public:
             res = max(max(res, dp2), dp1);
         }
         return res;
+    }
+    
+    // 697. 数组的度
+    
+    int findShortestSubArray(vector<int>& nums) {
+        unordered_map<int, vector<int>> dict;
+        for(int i=0; i<nums.size(); i++){
+            if(!dict.count(nums[i])){
+                // find none
+                dict[nums[i]] = {1, i, i};
+            }
+            else{
+                dict[nums[i]][0]++;
+                dict[nums[i]][2] = i;
+            }
+        }
+        int res = 0;
+        int num_max = 0;
+        for(auto it=dict.begin(); it!=dict.end(); it++){
+            // 可以计算目前数字的最长范围 it->second[2] - it->second[1] + 1， 和目前的进行比较
+            
+            if(it->second[0] == num_max){
+                // 数字是当前具备最大度
+                res = min(res, it->second[2] - it->second[1] + 1);
+            }
+            else if(it->second[0] > num_max){
+                num_max = it->second[0];
+                res = it->second[2] - it->second[1] + 1; // 必须覆写
+            }
+        }
+        return res;
+    }
+    
+    // 55. 跳跃游戏
+    bool canJump_method1(vector<int>& nums) {
+        // 复杂写法：时间复杂度 O(N^2)
+        int n = nums.size();
+        vector<int> dp(n, 0);
+        dp[0] = 1;
+        for(int i=0; i<n; i++){
+            if(dp[i] > 0){
+                for(int j=i; j<=min(n-1, i+nums[i]); j++){
+                    dp[j] = 1;
+                }
+            }
+            if(dp[n-1] > 0){
+                return true;
+            }
+        }
+        return dp[n-1] > 0;
+    }
+    
+    bool canJump_method2(vector<int>& nums) {
+        // 简化写法: 时间复杂度 O(N^2)
+        // 实际只需要记录最长可抵达下标即可
+        int n = nums.size();
+        int largest = 0; // 目前是在下标0
+        for(int i=0; i<n; i++){
+            if(i <= largest){
+                largest = (i + nums[i] > largest) ? i + nums[i]: largest;
+                if(largest >= n - 1){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     
@@ -3640,6 +3700,79 @@ public:
                 matrix[i][w-1-j] = tmp;
             }
         }
+    }
+    
+    // 逆序对
+    vector<int> merge_sort_tmp;
+    int merge_sort(vector<int>& nums, int l, int r){
+        if(l >= r){return 0;}
+        int mid = (l + r) / 2;
+        int res = merge_sort(nums, l, mid) + merge_sort(nums, mid + 1, r);
+        // begin to merge sort
+        for(int p = l; p <= r; p++){
+            merge_sort_tmp[p] = nums[p];
+        }
+        int i = l, j = mid + 1;
+        for(int k = l; k <= r; k++){
+            if(i == mid + 1){
+                nums[k] = merge_sort_tmp[j];
+                j++;
+            }
+            else if(j == r + 1){
+                nums[k] = merge_sort_tmp[i];
+                i++;
+            }
+            else if(merge_sort_tmp[i] <= merge_sort_tmp[j]){
+                nums[k] = merge_sort_tmp[i];
+                i++;
+            }
+            else{
+                nums[k] = merge_sort_tmp[j];
+                j++;
+                res += (mid - i + 1);
+            }
+        }
+        return res;
+    }
+    int reversePairs(vector<int>& nums) {
+        for(auto i: nums){merge_sort_tmp.push_back(0);}
+        return merge_sort(nums, 0, nums.size()-1);
+    }
+    
+    // 249. 移位字符串分组
+    
+    string groupStringsnormalize(string s){
+        if(s==""){
+            return s;
+        }
+        string res = "a";
+        int dis = s[0] - 'a';
+        for(int i=1; i<s.size(); i++){
+            if(s[i] - 'a' < dis){
+                res.push_back(s[i] + 26 - dis);
+            }
+            else{
+                res.push_back(s[i] - dis);
+            }
+        }
+        return res;
+    }
+    vector<vector<string>> groupStrings(vector<string>& strings) {
+        vector<vector<string>> res;
+        unordered_map<string, vector<string>> dict;
+        for(auto &s: strings){
+            string curr = groupStringsnormalize(s);
+            if(!dict.count(curr)){
+                dict[curr] = {s};
+            }
+            else{
+                dict[curr].push_back(s);
+            }
+        }
+        for(auto it = dict.begin(); it != dict.end(); it++){
+            res.push_back(it->second);
+        }
+        return res;
     }
     
 };
