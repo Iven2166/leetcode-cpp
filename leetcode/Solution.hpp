@@ -913,6 +913,181 @@ public:
         return false;
     }
     
+    // 45. 跳跃游戏 II
+    int jump_method1(vector<int>& nums) {
+        // 嵌套了，其实是 O(N^2)
+        int n = nums.size();
+        vector<int> dp(n, INT_MAX); // 记录在能到达下标i时的最少次数
+        dp[0] = 0; // 直接到达下标0时，仅需1次
+        for(int i=0; i<n; i++){
+            for(int j=0; j<=min(nums[i], n-1-i); j++){
+                dp[i + j] = min(dp[i + j], dp[i] + 1);
+                // j<=nums[i], i+j<=n-1, j<=n-1-i
+            }
+        }
+        return dp[n-1];
+    }
+    
+    int jump_method2(vector<int>& nums) {
+        // 简化写法
+        int start = 0, end = 1, ans = 0, n = nums.size();
+        while(end < n){
+            int maxPos = 0; // 能到达的最远距离
+            for(int i=start; i<min(end, n); i++){
+                // 右开写法
+                maxPos = max(maxPos, i + nums[i]);
+            }
+            // 更新下一个节点起始和结束位置
+            start = end;
+            end = maxPos + 1;
+            ans++; // 跳跃次数视为加1
+        }
+        return ans;
+    }
+    
+    // 56. 合并区间
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        // 排序
+        // 维护一个left和right，如果当下的无法合并，则left和right作为新区间push进ans里
+        // 如果left和right是初始化，则直接等于当下的
+        vector<vector<int>> ans;
+        sort(intervals.begin(), intervals.end());
+        int left=-1, right=-1;
+        for(auto iter: intervals){
+            if(left==-1 && right==-1){
+                left = iter[0];
+                right = iter[1];
+            }
+            else{
+                if(iter[0] > right){
+                    ans.push_back({left, right});
+                    left = iter[0];
+                    right=iter[1];
+                }
+                else if(iter[1] > right){
+                    right = iter[1];
+                }
+            }
+        }
+        if(left>=0 && right>=0){
+            ans.push_back({left, right});
+        }
+        return ans;
+    }
+    
+    // 57. 插入区间
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        int left = newInterval[0], right = newInterval[1];
+        bool pushed = false;
+        vector<vector<int>> res;
+        for(auto vals: intervals){
+            if(vals[1] < left){
+                res.push_back(vals);
+            }
+            else if(vals[0] > right){
+                if(!pushed){
+                    res.push_back({left, right});
+                    pushed = true;
+                }
+                res.push_back(vals);
+            }
+            else{
+                left = min(left, vals[0]);
+                right = max(right, vals[1]);
+            }
+        }
+        if(!pushed){
+            res.push_back({left, right});
+        }
+        return res;
+    }
+    
+    //763. 划分字母区间
+    vector<int> partitionLabels(string s) {
+        int last[26];
+        int n = s.size();
+        for(int i=0; i<n; i++){
+            last[s[i] - 'a'] = i;
+        }
+        vector<int> partition;
+        int start = 0, end = 0;
+        for(int i=0; i<n; i++){
+            end = max(end, last[s[i]-'a']); // 获取到 i 位置为止的所有字母的最大end
+            if(i == end){
+                partition.push_back(end - start + 1);
+                start = end + 1;
+            }
+        }
+        return partition;
+    }
+    
+    // 252. 会议室
+    bool canAttendMeetings(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+        int last = -1;
+        for(auto pair: intervals){
+            if(pair[0] >= last){
+                last = pair[1];
+            }
+            else{
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // 253. 会议室 II
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+        /*
+         1、以 pair[0] 开始时间进行排序，先开始的先进行会议安排
+         2、由于要判断是否需要新增会议室，所以是得看前面最早结束的会议室有没有合适的时间
+         2、维护一个小根堆，来保持目前最短的会议结束时间，以此来判断是不是需要新增会议室
+        */
+        int res = 1;
+        sort(intervals.begin(), intervals.end());
+        priority_queue<int, vector<int>, greater<>> pq;
+        pq.push(intervals[0][1]);
+        for(int i=1; i < intervals.size(); i++){
+            if(intervals[i][0] >= pq.top()){
+                pq.pop();
+            }
+            else{
+                res ++;
+            }
+            pq.push(intervals[i][1]);
+        }
+        return res;
+    }
+    
+    // 616. 给字符串添加加粗标签
+    string addBoldTag(string s, vector<string>& words) {
+        int n = s.size();
+        vector<bool> mask(n, false);
+        for(auto &word: words){
+            int pos = 0;
+            // string::find 用法：https://cplusplus.com/reference/string/string/find/
+            while(s.find(word, pos) != string::npos)
+            {
+                pos = s.find(word, pos); // 找到一个可能位置
+                for(int i=pos; i<pos+word.size(); i++){
+                    mask[i] = true;
+                }
+                pos++;
+            }
+        }
+        string res;
+        for(int i=0; i < n; i++){
+            if(mask[i] && (i==0 || !mask[i-1])){
+                res.append("<b>");
+            }
+            res.push_back(s[i]);
+            if(mask[i] && (i==n-1 || !mask[i+1])){
+                res.append("</b>");
+            }
+        }
+        return res;
+    }
+    
     
     // 21. 合并两个有序链表
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
