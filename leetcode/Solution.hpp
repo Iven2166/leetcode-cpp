@@ -1088,6 +1088,71 @@ public:
         return res;
     }
     
+    // 62. 不同路径
+    int uniquePaths(int m, int n) {
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+        dp[0][0] = 1;
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                dp[i][j] += (i>0)? dp[i-1][j] : 0;
+                dp[i][j] += (j>0)? dp[i][j-1] : 0;
+            }
+        }
+        return dp[m-1][n-1];
+    }
+    
+    // 64. 最小路径和
+    int minPathSum(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        vector<vector<int>> dp(m, vector<int>(n, INT_MAX));
+        dp[0][0] = grid[0][0];
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(i==0 && j==0)
+                    continue;
+                dp[i][j] = i>0 ? min(dp[i-1][j], dp[i][j]) : dp[i][j];
+                dp[i][j] = j>0 ? min(dp[i][j-1], dp[i][j]) : dp[i][j];
+                dp[i][j] += grid[i][j];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+    
+    // 63. 不同路径 II
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        vector<vector<int>> grid = obstacleGrid;
+        int m = grid.size(), n = grid[0].size();
+        if(m==1 && n==1){
+            if(grid[0][0]==1)
+                return 0;
+        }
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+        dp[0][0] = 1;
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(i==0 && j==0)
+                    continue;
+                if(grid[i][j]==1)
+                    continue;
+                dp[i][j] += i>0 && grid[i-1][j]==0 ? dp[i-1][j] : 0;
+                dp[i][j] += j>0 && grid[i][j-1]==0 ? dp[i][j-1] : 0;
+            }
+        }
+        return dp[m-1][n-1];
+    }
+    
+    // 70. 爬楼梯
+    int climbStairs(int n) {
+        if(n<=2)
+            return n;
+        int dp1 = 1, dp2 = 2;
+        for(int i=3; i<=n; i++){
+            int tmp = dp2;
+            dp2 += dp1;
+            dp1 = tmp;
+        }
+        return dp2;
+    }
     
     // 21. 合并两个有序链表
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
@@ -1382,6 +1447,47 @@ public:
             ans += (min <= height[i]) ? 0 : min - height[i];
         }
         return ans;
+    }
+    
+    
+    // 4. 寻找两个正序数组的中位数
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2){
+        int len1 = nums1.size(), len2 = nums2.size();
+        if((len1+len2)%2==1){
+            return findMedianSortedArraysHelper(nums1, nums2, len1, len2, (len1 + len2)/2+1);
+        }
+        else{
+            return (findMedianSortedArraysHelper(nums1, nums2, len1, len2, (len1 + len2)/2) + findMedianSortedArraysHelper(nums1, nums2, len1, len2, (len1 + len2)/2+1))/2.0;
+        }
+        return 0;
+    }
+    double findMedianSortedArraysHelper(vector<int>& nums1, vector<int>& nums2, int len1, int len2, int k){
+        int p1 = 0, p2 = 0;
+        while(true){
+            // end case
+            if(p1 == len1){
+                return nums2[p2 + k - 1];
+            }
+            else if(p2 == len2){
+                return nums1[p1 + k - 1];
+            }
+            if(k == 1){
+                return min(nums1[p1], nums2[p2]);
+            }
+            // k > 1 && p1 < len1 && p2 < len2
+            int next_p1 = min(len1 - 1, p1 + k/2 - 1); // -1的操作
+            int next_p2 = min(len2 - 1, p2 + k/2 - 1);
+            if(nums1[next_p1] < nums2[next_p2]){
+                // 先达到 next_p1 , k 减去当前前进的步数
+                k -= (next_p1 - p1 + 1); // 左闭右闭
+                p1 = next_p1 + 1;
+            }
+            else{
+                k -= (next_p2 - p2 + 1);
+                p2 = next_p2 + 1;
+            }
+        }
+        return 0;
     }
     
     // 15. 三数之和
@@ -1875,6 +1981,97 @@ public:
             right--;
         }
     }
+    
+    // 72. 编辑距离
+    int min3(int a, int b, int c){
+        return min(a, min(b,c));
+    }
+    int minDistance(string word1, string word2) {
+        int n1 = word1.size(), n2 = word2.size();
+        vector<vector<int>> dp(n1 + 1, vector<int>(n2 + 1, 0));
+        // base case
+        for(int i=1; i<=n1; i++){
+            dp[i][0] = i; // 删除i个得到空字符串
+        }
+        for(int i=1; i<=n2; i++){
+            dp[0][i] = i; // 空字符串增加i个
+        }
+        for(int i=1; i<=n1; i++){
+            for(int j=1; j<=n2; j++){
+                if(word1[i-1] == word2[j-1]){
+                    dp[i][j] = dp[i-1][j-1];
+                }
+                else{
+                    dp[i][j] = min3(
+                                   dp[i-1][j] + 1, // 删除一个
+                                   dp[i][j-1] + 1, // 增加一个
+                                   dp[i-1][j-1] + 1 // 交换一个
+                                   );
+                }
+            }
+        }
+        return dp[n1][n2];
+    }
+    
+    // 161. 相隔为 1 的编辑距离
+    /**
+     距离需要为1个，即 |m-n|>1时不需考虑
+     m-n==1：删除一个
+     n-m==1：增加一个
+     m==n：仅有一个字符不同
+     */
+    bool isOneEditDistance(string s, string t){
+        if(s=="" && t==""){
+            return false;
+        }
+        int m = s.size(), n = t.size();
+        if(m - n==1){
+            // s delete one to t
+            return isOneInsert(s, t);
+        }
+        else if(n - m == 1){
+            // s add one to t
+            return isOneInsert(t, s);
+        }
+        else if(n == m){
+            // 仅有一个字符不同时才有效
+            int cnt = 0;
+            for(int i=0; i<n; i++){
+                if(s[i]!=t[i]){
+                    cnt++;
+                }
+                if(cnt > 1){
+                    return false;
+                }
+            }
+            return cnt == 1;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    bool isOneInsert(string longer, string shorter){
+        int i = 0, k = 0, n = longer.size();
+        int diffcnt = 0;
+        while(i < n && k < n-1){
+            if(longer[i]!=shorter[k] && diffcnt == 0){
+                i++;
+                diffcnt++;
+            }else if(longer[i]!=shorter[k] && diffcnt > 0){
+                return false;
+            }
+            else if(longer[i]==shorter[k]){
+                i++;
+                k++;
+            }
+        }
+        if(diffcnt > 1){
+            return false;
+        }
+        return true;
+    }
+    
     // 394. 字符串解码
     string decodeString(string s){
         stack<pair<string,int>> stk;
@@ -3812,6 +4009,19 @@ public:
     }
     
     // 11. 盛最多水的容器
+    /*
+     给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) 。
+
+     找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+     返回容器可以储存的最大水量。
+
+     说明：你不能倾斜容器。
+
+     来源：力扣（LeetCode）
+     链接：https://leetcode.cn/problems/container-with-most-water
+     著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     */
     int maxArea11(vector<int>& height){
         int left = 0, right = height.size() - 1;
         int res = INT_MIN;
