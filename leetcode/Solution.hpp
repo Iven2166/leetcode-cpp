@@ -2072,6 +2072,30 @@ public:
         return true;
     }
     
+    int minDistance(string word1, string word2){
+        // 寻找两个字符串的共同子串
+        /**
+         动态规划：dp[n1+1][n2+1],第0位是空字符串
+         到第 i, j 时，
+         - 如果 word1[i]==word2[j]，则 dp[i][j]=min(dp[i-1][j-1], min(dp[i-1][j], dp[i][j-1]) + 1)
+         - 如果 ！=，则dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + 1
+         */
+        int n1 = word1.size(), n2 = word2.size();
+        vector<vector<int>> dp(n1+1, vector<int>(n2 + 1, 0));
+        dp[0][0] = 0; // 空字符串到空字符串
+        dp[0][1] = dp[1][0] = 0;
+        for(int p1=1; p1 < n1 + 1; p1++){
+            for(int p2=1; p2 < n2 + 1; p2++){
+                if(word1[p1-1]==word2[p2-1]){
+                    dp[p1][p2] = dp[p1-1][p2-1] + 1;
+                }else{
+                    dp[p1][p2] = max(dp[p1-1][p2], dp[p1][p2-1]);
+                }
+            }
+        }
+        return n1 + n2 - 2 * dp[n1][n2];
+    }
+    
     // 394. 字符串解码
     string decodeString(string s){
         stack<pair<string,int>> stk;
