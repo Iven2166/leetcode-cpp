@@ -4183,6 +4183,17 @@ public:
         }
         return res;
     }
+    //1015. 可被 K 整除的最小整数
+    // https://leetcode.cn/problems/smallest-integer-divisible-by-k/solution/san-chong-suan-fa-you-hua-pythonjavacgo-tk4cj/
+    int smallestRepunitDivByK(int k) {
+        unordered_set<int> seen;
+        int x = 1 % k;
+        while(x && !seen.count(x)){
+            seen.insert(x);
+            x = (x * 10 + 1) % k;
+        }
+        return x ? -1 : seen.size() + 1;
+    }
     
 };
 
