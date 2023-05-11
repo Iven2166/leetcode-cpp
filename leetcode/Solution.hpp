@@ -4195,6 +4195,28 @@ public:
         return x ? -1 : seen.size() + 1;
     }
     
+    // 1016. 子串能表示从 1 到 N 数字的二进制串
+    string num_to_str(int N){
+        string str = "";
+        int tmp = 0;
+        while(N){
+            tmp = N & 1;
+            str += (tmp + '0');
+            N >>= 1;
+        }
+        reverse(str.begin(), str.end());
+        return str;
+    }
+
+    bool queryString(string s, int n) {
+        for(int i = 1; i <= n; i++){
+            if(s.find(num_to_str(i)) == -1){
+                return false;
+            }
+        }
+        return true;
+    }
+    
 };
 
 // 重载运算符号：打印 vector<vector<int>>
